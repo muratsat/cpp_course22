@@ -14,6 +14,8 @@ class RingBuffer {
     item_ = new int[capacity];
   }
 
+  ~RingBuffer() { delete[] item_; }
+
   size_t Size() const { return size_; }
 
   bool Empty() const { return size_ == 0; }
