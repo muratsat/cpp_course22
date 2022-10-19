@@ -1,9 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <vector>
 
 class RingBuffer {
-  int* item_;
+  std::vector<int> item_;
   int capacity_;
   int size_ = 0;
   int begin_ = 0;
@@ -11,10 +12,8 @@ class RingBuffer {
 
  public:
   explicit RingBuffer(size_t capacity) : capacity_(capacity) {
-    item_ = new int[capacity];
+    item_.resize(capacity);
   }
-
-  ~RingBuffer() { delete[] item_; }
 
   size_t Size() const { return size_; }
 
