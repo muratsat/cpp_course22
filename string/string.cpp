@@ -103,3 +103,46 @@ void String::Swap(String& other) {
   capacity_ = tmp_capacity;
   s_ = tmp_s;
 }
+
+static int Min(int a, int b) { return a < b ? a : b; }
+
+bool operator<(const String& s1, const String& s2) {
+  size_t size = Min(s1.Size(), s2.Size());
+  for (int i = 0; i < size; i++) {
+    if (s1[i] != s2[i]) {
+      return s1[i] < s2[i];
+    }
+  }
+  return s1.Size() < s2.Size();
+}
+
+bool operator>(const String& s1, const String& s2) { return (s2 < s1); }
+
+bool operator<=(const String& s1, const String& s2) {
+  size_t size = Min(s1.Size(), s2.Size());
+  for (int i = 0; i < size; i++) {
+    if (s1[i] > s2[i]) {
+      return false;
+    }
+  }
+  return s1.Size() <= s2.Size();
+}
+
+bool operator>=(const String& s1, const String& s2) { return (s2 <= s1); }
+
+bool operator==(const String& s1, const String& s2) {
+  if (s1.Size() != s2.Size()) {
+    return false;
+  }
+
+  size_t size = s1.Size();
+
+  for (int i = 0; i < size; i++) {
+    if (s1[i] != s2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool operator!=(const String& s1, const String& s2) { return !(s1 == s2); }
