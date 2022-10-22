@@ -5,8 +5,8 @@
 
 class RingBuffer {
   std::vector<int> item_;
-  int capacity_;
-  int size_ = 0;
+  size_t capacity_;
+  size_t size_ = 0;
   int begin_ = 0;
   int end_ = 0;
 
@@ -20,11 +20,11 @@ class RingBuffer {
   bool Empty() const { return size_ == 0; }
 
   bool TryPush(int element) {
-    int end = (end_ + 1) % capacity_;
-    if (end == begin_) {
+    if (size_ == capacity_) {
       return false;
     }
-    item_[end] = element;
+    item_[end_] = element;
+    end_ = (end_ + 1) % capacity_;
     size_++;
     return true;
   }
