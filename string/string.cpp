@@ -92,6 +92,18 @@ void String::ShrinkToFit() {
   }
 }
 
+void String::Swap(String& other) {
+  size_t tmp_size = other.size_;
+  size_t tmp_capacity = other.capacity_;
+  char* tmp_s = other.s_;
+  other.size_ = size_;
+  other.capacity_ = capacity_;
+  other.s_ = s_;
+  size_ = tmp_size;
+  capacity_ = tmp_capacity;
+  s_ = tmp_s;
+}
+
 const char& String::operator[](size_t id) const { return s_[id]; }
 
 char& String::operator[](size_t id) { return s_[id]; }
