@@ -108,6 +108,14 @@ const char& String::operator[](size_t id) const { return s_[id]; }
 
 char& String::operator[](size_t id) { return s_[id]; }
 
+char& String::Front() { return operator[](0); }
+
+char String::Front() const { return operator[](0); }
+
+char& String::Back() { return operator[](size_ - 1); }
+
+char String::Back() const { return operator[](size_ - 1); }
+
 bool String::Empty() const { return size_ == 0; }
 
 size_t String::Size() const { return size_; }
