@@ -38,8 +38,25 @@ String::String(String const& other) : String(other.s_) {
   Reserve(other.capacity_);
 }
 
+String& String::operator=(const String& other) {
+  if (&other == this) {
+    *this = String(other);
+  }
+  return *this;
+}
+
+void String::Clear() { Resize(0); }
+
+void String::PushBack(char character) {
+  Resize(size_ + 1);
+  s_[size_ - 1] = character;
+}
+
+void String::PopBack() { Resize(Max(size_ - 1, 0)); }
+
 void String::Resize(size_t new_size) {
-  Reserve(new_size + 1);
+  size_t new_capacity = Max(new_size + 1, size_ * kMultipler);
+  Reserve(new_capacity);
   if (new_size > size_) {
     memset(s_ + size_, kStringTerminator, new_size - size_);
   }
