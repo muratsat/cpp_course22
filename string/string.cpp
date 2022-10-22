@@ -2,52 +2,87 @@
 
 #include <cstring>
 
+// Оказыватся, что, если при каждом переполнении массива увеличивать его
+// вместимость в константное число раз, то можно добиться линейной зависимости
+// числа операций над массивом от числа добавляемых элементов
+// (https://en.wikipedia.org/wiki/Dynamic_array#Geometric_expansion_and_amortized_cost).
+// В вашем решении будет проверяться корректность работы данной схемы при
+// множителе равном
+// 2 (то есть, если фактический размер изменяется так:
+// 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> ...,
+// то вместимость меняется следующим образом:
+// 0 -> 1 -> 2 -> 4 -> 4 -> 8 -> ...).
 static const int kMultipler = 2;
+
+static const char kStringTerminator = '\0';
 
 static int Max(int a, int b) { return a > b ? a : b; }
 
 String::~String() {
-  if (capacity_ != 0) {
-    delete[] s_;
+  if (s_ != nullptr) {
+    free(s_);
   }
+}
+
+String::String(size_t size, char character) { Resize(size, character); }
+
+String::String(const char* c_string) {
+  size_t new_size = strlen(c_string);
+  Reserve(new_size * kMultipler);
+  memcpy(s_, c_string, new_size);
+  size_ = new_size;
+};
+
+String::String(String const& other) : String(other.s_) {
+  Resize(other.size_);
+  Reserve(other.capacity_);
+}
+
+void String::Resize(size_t new_size) {
+  Reserve(new_size + 1);
+  if (new_size > size_) {
+    memset(s_ + size_, kStringTerminator, new_size - size_);
+  }
+  size_ = new_size;
+  s_[size_] = kStringTerminator;
+}
+
+void String::Resize(size_t new_size, char character) {
+  Reserve(new_size + 1);
+  if (new_size > size_) {
+    memset(s_ + size_, character, new_size - size_);
+  }
+  size_ = new_size;
+  s_[size_] = kStringTerminator;
 }
 
 void String::Reserve(size_t new_capacity) {
   if (new_capacity <= capacity_) {
     return;
   }
-  capacity_ = new_capacity;
-  s_ = new char[capacity_];
-}
-
-String::String(const char* c_string) {
-  size_t new_size = Max(1, strlen(c_string));
-  // TODO:
-  // rezize data array
-  Reserve(new_size * kMultipler);
-  memcpy(s_, c_string, new_size);
-  size_ = new_size;
-};
-
-std::istream& operator>>(std::istream& input, String& str) {
-  const size_t kMinSize = Max(str.capacity_, 40);
-  str.Reserve(kMinSize);
-  str.s_ = new char[kMinSize];
-
-  char ch;
-  input.get(ch);
-  size_t i = 0;
-  while (EOF != ch && ch != '\n') {
-    str.s_[i++] = ch;
-    if (i >= str.capacity_) {
-      str.capacity_ *= kMultipler;
-      str.s_ = new char[str.capacity_];
-    }
-    input.get(ch);
+  if (capacity_ == 0) {
+    s_ = (char*)malloc(new_capacity);
+  } else {
+    s_ = (char*)realloc(s_, new_capacity);
   }
-
-  str.size_ = i;
-  str.s_[i] = '\0';
-
-  return input;
+  capacity_ = new_capacity;
 }
+
+void String::ShrinkToFit() {
+  if (capacity_ > size_) {
+    s_ = (char*)realloc(s_, size_);
+    capacity_ = size_;
+  }
+}
+
+const char& String::operator[](size_t id) const { return s_[id]; }
+
+char& String::operator[](size_t id) { return s_[id]; }
+
+bool String::Empty() const { return size_ == 0; }
+
+size_t String::Size() const { return size_; }
+
+size_t String::Capacity() const { return capacity_; }
+
+const char* String::Data() const { return s_; }

@@ -81,13 +81,13 @@ class String {
   bool Empty() const;
 
   // возвращает размер
-  size_t Size();
+  size_t Size() const;
 
   // возвращает вместимость
-  size_t Capacity();
+  size_t Capacity() const;
 
   // возвращает указатель на начало массива.
-  char* Data();
+  const char* Data() const;
 
   // Операторы сравнения (<, >, <=, >=, ==, !=),
   // задающие лексикографический порядок
