@@ -59,35 +59,34 @@ class String {
   void Swap(String& other);
 
   // Константный оператор доступа по индексу[]
-  const char& operator[](size_t id) const;
+  const char& operator[](size_t id) const { return s_[id]; }
 
   // Неконстантный оператор доступа по индексу[]
   // Неконстантный должен позволять изменять полученный элемент(a[1] = 5)
-  char& operator[](size_t id);
-
+  char& operator[](size_t id) { return s_[id]; }
   // Константный доступ к первому символам
-  char& Front();
+  char& Front() { return operator[](0); }
 
   // Неконстантный доступ к первому символам
-  char Front() const;
+  char Front() const { return operator[](0); }
 
   // Неконстантный доступ к последнему символам
-  char& Back();
+  char& Back() { return operator[](size_ - 1); }
 
   // Константный доступ к последнему символам
-  char Back() const;
+  char Back() const { return operator[](size_ - 1); }
 
   // true, если строка пустая (размер 0)
-  bool Empty() const;
+  bool Empty() const { return size_ == 0; }
 
   // возвращает размер
-  size_t Size() const;
+  size_t Size() const { return size_; }
 
   // возвращает вместимость
-  size_t Capacity() const;
+  size_t Capacity() const { return capacity_; }
 
   // возвращает указатель на начало массива.
-  const char* Data() const;
+  const char* Data() const { return s_; }
 
   // Операторы сравнения (<, >, <=, >=, ==, !=),
   // задающие лексикографический порядок
