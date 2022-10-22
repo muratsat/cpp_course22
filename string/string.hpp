@@ -47,9 +47,9 @@ class String {
   // заполняет недостающие элементы значением character.
   void Resize(size_t new_size, char character);
 
-  // изменяет вместимость на max(new_cap, текущая вместимость) (если new_cap <=
-  // текущая вместимость, то делать ничего не нужно). Размер при этом не
-  // изменяется.
+  // изменяет вместимость на max(new_cap, текущая вместимость)
+  // (если new_cap <= текущая вместимость, то делать ничего не нужно).
+  // Размер при этом не изменяется.
   void Reserve(size_t new_cap);
 
   // уменьшает capacity до size (если capacity > size)
@@ -78,7 +78,7 @@ class String {
   char Back() const;
 
   // true, если строка пустая (размер 0)
-  bool Empty();
+  bool Empty() const;
 
   // возвращает размер
   size_t Size();
@@ -117,7 +117,7 @@ class String {
   String operator*(int n) const;
 
   // Оператор ввода из потока
-  friend std::istream& operator>>(std::istream& input, const String& s);
+  friend std::istream& operator>>(std::istream& input, String& s);
 
   // Оператор вывода в поток.
   friend std::ostream& operator<<(std::ostream& output, const String& s);
@@ -129,4 +129,7 @@ class String {
   String Join(const std::vector<String>& strings);
 
  private:
+  char* s_ = nullptr;
+  size_t size_ = 0;
+  size_t capacity_ = 0;
 };
