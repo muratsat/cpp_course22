@@ -15,7 +15,7 @@ class String {
   String(size_t size, char character);
 
   // Конструктор копирования
-  String(const String& orig);
+  String(const String& other);
 
   String(const char* c_string);
 
