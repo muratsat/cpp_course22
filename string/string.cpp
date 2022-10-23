@@ -33,7 +33,7 @@ String::String(const char* c_string) {
   size_ = new_size;
 };
 
-String::String(String const& other) : String(other.s_) {
+String::String(String const& other) : String(other.Data()) {
   Resize(other.size_);
   Reserve(other.capacity_);
 }
@@ -81,6 +81,9 @@ void String::Reserve(size_t new_capacity) {
     s_ = (char*)malloc(new_capacity);
   } else {
     s_ = (char*)realloc(s_, new_capacity);
+    if (capacity_ < new_capacity) {
+      memset((void*)Data() + capacity_, 0, new_capacity - capacity_);
+    }
   }
   capacity_ = new_capacity;
 }
@@ -146,3 +149,29 @@ bool operator==(const String& s1, const String& s2) {
 }
 
 bool operator!=(const String& s1, const String& s2) { return !(s1 == s2); }
+
+std::istream& operator>>(std::istream& input, String& s) {
+  s.Clear();
+  char c = 0;
+  while (c == ' ' || c == kStringTerminator) {
+    input.get(c);
+  }
+
+  if (!input) {
+    return input;
+  }
+
+  do {
+    s.PushBack(c);
+    input.get(c);
+  } while (input && c != ' ' && c != '\n');
+
+  return input;
+}
+
+std::ostream& operator<<(std::ostream& output, const String& s) {
+  for (int i = 0; i < s.Size(); i++) {
+    output << s[i];
+  }
+  return output;
+}

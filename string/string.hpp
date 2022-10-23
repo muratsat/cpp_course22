@@ -99,7 +99,7 @@ class String {
 
   // Оператор + для конкатенации строк.
   // Например, "ab" + "oba" = "aboba".
-  String& operator+(const String& other) const;
+  String operator+(const String& other) const;
 
   // Оператор += для конкатенации строк.
   // Операция s += t должна работать за O(|t|)!!!
