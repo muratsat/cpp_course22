@@ -112,7 +112,7 @@ static int Min(int a, int b) { return a < b ? a : b; }
 
 bool operator<(const String& s1, const String& s2) {
   size_t size = Min(s1.Size(), s2.Size());
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     if (s1[i] != s2[i]) {
       return s1[i] < s2[i];
     }
@@ -124,7 +124,7 @@ bool operator>(const String& s1, const String& s2) { return (s2 < s1); }
 
 bool operator<=(const String& s1, const String& s2) {
   size_t size = Min(s1.Size(), s2.Size());
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     if (s1[i] > s2[i]) {
       return false;
     }
@@ -141,7 +141,7 @@ bool operator==(const String& s1, const String& s2) {
 
   size_t size = s1.Size();
 
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     if (s1[i] != s2[i]) {
       return false;
     }
@@ -171,7 +171,7 @@ std::istream& operator>>(std::istream& input, String& s) {
 }
 
 std::ostream& operator<<(std::ostream& output, const String& s) {
-  for (int i = 0; i < s.Size(); i++) {
+  for (size_t i = 0; i < s.Size(); i++) {
     output << s[i];
   }
   return output;
