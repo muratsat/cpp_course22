@@ -29,9 +29,8 @@ String::String(size_t size, char character) { Resize(size, character); }
 
 String::String(const char* c_string) {
   size_t new_size = strlen(c_string);
-  Reserve(new_size * kMultipler);
+  Resize(new_size);
   memcpy(s_, c_string, new_size);
-  size_ = new_size;
 };
 
 String::String(String const& other) {
@@ -58,8 +57,8 @@ void String::PopBack() { Resize(Max(size_ - 1, 0)); }
 void String::Resize(size_t new_size) {
   size_t new_capacity = Max(new_size + 1, size_ * kMultipler);
   Reserve(new_capacity);
-  if (new_size > size_) {
-    memset(s_ + size_, kStringTerminator, new_size - size_);
+  if (new_capacity > new_size) {
+    memset(s_ + new_size, kStringTerminator, new_capacity - new_size);
   }
   size_ = new_size;
   s_[size_] = kStringTerminator;
@@ -177,13 +176,22 @@ std::ostream& operator<<(std::ostream& output, const String& s) {
   return output;
 }
 
-// TODO
-String& String::operator+=(const String& other) { return *this; }
+String& String::operator+=(const String& other) {
+  size_t old_size = Size();
+  Resize(old_size + other.Size());
+  memcpy((void*)(Data() + old_size), other.Data(), other.Size());
+  return *this;
+}
 
-// TODO
 String String::operator+(const String& other) const {
   String res(*this);
+  res += other;
   return res;
+}
+
+String& String::operator+(const String& other) {
+  *this += other;
+  return *this;
 }
 
 String& String::operator*=(int n) {
@@ -219,11 +227,15 @@ String String::operator*(int n) const {
 // TODO
 std::vector<String> String::Split(const String& delim) {
   std::vector<String> res;
+  delim;
   return res;
 }
 
 // TODO
 String String::Join(const std::vector<String>& strings) {
   String res;
+  if (strings.empty()) {
+    res.Clear();
+  }
   return res;
 }
