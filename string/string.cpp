@@ -225,14 +225,14 @@ String String::operator*(int n) const {
 }
 
 // TODO
-std::vector<String> String::Split(const String& delim) {
+std::vector<String> String::Split(const String& delim) const {
   std::vector<String> res;
   delim;
   return res;
 }
 
 // TODO
-String String::Join(const std::vector<String>& strings) {
+String String::Join(const std::vector<String>& strings) const {
   String res;
   if (strings.empty()) {
     res.Clear();

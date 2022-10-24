@@ -126,10 +126,10 @@ class String {
   friend std::ostream& operator<<(std::ostream& output, const String& s);
 
   // Аналог сплита в питоне.
-  static std::vector<String> Split(const String& delim = " ");
+  std::vector<String> Split(const String& delim = " ") const;
 
   // Аналог джоина в питоне.
-  String Join(const std::vector<String>& strings);
+  String Join(const std::vector<String>& strings) const;
 
  private:
   char* s_ = nullptr;
