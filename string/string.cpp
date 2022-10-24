@@ -31,7 +31,7 @@ String::String(const char* c_string) {
   size_t new_size = strlen(c_string);
   Resize(new_size);
   memcpy(s_, c_string, new_size);
-};
+}
 
 String::String(String const& other) {
   Resize(other.Size());
