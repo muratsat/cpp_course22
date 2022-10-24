@@ -232,7 +232,7 @@ std::vector<String> String::Split(const String& delim) const {
 }
 
 // TODO
-String String::Join(const std::vector<String>& strings) const {
+String String::Join(const std::vector<String>& strings) {
   String res;
   if (strings.empty()) {
     res.Clear();
