@@ -113,6 +113,9 @@ class String {
   // Умножение числа на строку должно приводить ошибку компиляции!
   // Загадка о лектора по алгоритмам - не возникло ли у вас
   // аналогии с каким-то известным вам алгоритмом?)
+  String& operator*=(int n);
+  String& operator*(int n);
+  friend String& operator*(int n, String& str);
   String operator*(int n) const;
 
   // Оператор ввода из потока

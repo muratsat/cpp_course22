@@ -1,6 +1,7 @@
 #include "string.hpp"
 
 #include <cstring>
+#include <vector>
 
 // Оказыватся, что, если при каждом переполнении массива увеличивать его
 // вместимость в константное число раз, то можно добиться линейной зависимости
@@ -33,13 +34,13 @@ String::String(const char* c_string) {
   size_ = new_size;
 };
 
-String::String(String const& other) : String(other.Data()) {
-  Resize(other.size_);
-  Reserve(other.capacity_);
+String::String(String const& other) {
+  Resize(other.Size());
+  memcpy((void*)Data(), other.Data(), other.Size());
 }
 
 String& String::operator=(const String& other) {
-  if (&other == this) {
+  if (&other != this) {
     *this = String(other);
   }
   return *this;
@@ -82,7 +83,7 @@ void String::Reserve(size_t new_capacity) {
   } else {
     s_ = (char*)realloc(s_, new_capacity);
     if (capacity_ < new_capacity) {
-      memset((void*)Data() + capacity_, 0, new_capacity - capacity_);
+      memset((void*)(Data() + capacity_), 0, new_capacity - capacity_);
     }
   }
   capacity_ = new_capacity;
@@ -174,4 +175,55 @@ std::ostream& operator<<(std::ostream& output, const String& s) {
     output << s[i];
   }
   return output;
+}
+
+// TODO
+String& String::operator+=(const String& other) { return *this; }
+
+// TODO
+String String::operator+(const String& other) const {
+  String res(*this);
+  return res;
+}
+
+String& String::operator*=(int n) {
+  if (n < 0) {
+    return *this;
+  }
+  size_t old_size = Size();
+  size_t new_size = Size() * n;
+  Resize(new_size);
+
+  for (size_t i = old_size; i < new_size; i++) {
+    s_[i] = s_[i % old_size];
+  }
+
+  return *this;
+}
+
+String& String::operator*(int n) {
+  *this *= n;
+  return *this;
+}
+
+String& operator*(int n, String& str) {
+  str *= n;
+  return str;
+}
+
+String String::operator*(int n) const {
+  String res(*this);
+  return res * n;
+}
+
+// TODO
+std::vector<String> String::Split(const String& delim) {
+  std::vector<String> res;
+  return res;
+}
+
+// TODO
+String String::Join(const std::vector<String>& strings) {
+  String res;
+  return res;
 }
