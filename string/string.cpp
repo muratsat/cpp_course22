@@ -227,13 +227,15 @@ String String::operator*(int n) const {
 // TODO
 std::vector<String> String::Split(const String& delim) const {
   std::vector<String> res;
-  delim;
+  if (delim.Empty()) {
+    res.push_back(*this);
+  }
   return res;
 }
 
 // TODO
 String String::Join(const std::vector<String>& strings) {
-  String res;
+  String res(*this);
   if (strings.empty()) {
     res.Clear();
   }

@@ -129,7 +129,7 @@ class String {
   std::vector<String> Split(const String& delim = " ") const;
 
   // Аналог джоина в питоне.
-  static String Join(const std::vector<String>& strings);
+  String Join(const std::vector<String>& strings);
 
  private:
   char* s_ = nullptr;
