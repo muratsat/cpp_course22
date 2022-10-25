@@ -224,7 +224,6 @@ std::vector<String> String::Split(const String& delim) const {
   if (s.Empty() || delim.Empty()) {
     res.push_back(s);
   }
-
   String tmp;
   size_t j = 0;
   for (size_t i = 0; i < s.Size(); i++) {
@@ -245,7 +244,6 @@ std::vector<String> String::Split(const String& delim) const {
       j = 0;
     }
   }
-
   if (!tmp.Empty()) {
     res.push_back(tmp);
   }
