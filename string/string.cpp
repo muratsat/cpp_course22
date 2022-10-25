@@ -40,7 +40,8 @@ String::String(String const& other) {
 
 String& String::operator=(const String& other) {
   if (&other != this) {
-    *this = String(other);
+    Resize(other.Size());
+    memcpy((void*)Data(), other.Data(), other.Size());
   }
   return *this;
 }
@@ -57,6 +58,7 @@ void String::PopBack() { Resize(Max(size_ - 1, 0)); }
 void String::Resize(size_t new_size) {
   size_t new_capacity = Max(new_size + 1, size_ * kMultipler);
   Reserve(new_capacity);
+  new_capacity = Capacity();
   if (new_capacity > new_size) {
     memset(s_ + new_size, kStringTerminator, new_capacity - new_size);
   }
@@ -178,24 +180,21 @@ std::ostream& operator<<(std::ostream& output, const String& s) {
 
 String& String::operator+=(const String& other) {
   size_t old_size = Size();
-  Resize(old_size + other.Size());
-  memcpy((void*)(Data() + old_size), other.Data(), other.Size());
+  size_t other_size = other.Size();
+  Resize(old_size + other_size);
+  memcpy((void*)(Data() + old_size), other.Data(), other_size);
   return *this;
 }
 
 String String::operator+(const String& other) const {
-  String res(*this);
+  String res = *this;
   res += other;
   return res;
 }
 
-String& String::operator+(const String& other) {
-  *this += other;
-  return *this;
-}
-
 String& String::operator*=(int n) {
-  if (n < 0) {
+  if (n <= 0) {
+    Clear();
     return *this;
   }
   size_t old_size = Size();
@@ -205,23 +204,18 @@ String& String::operator*=(int n) {
   for (size_t i = old_size; i < new_size; i++) {
     s_[i] = s_[i % old_size];
   }
-
   return *this;
 }
 
-String& String::operator*(int n) {
-  *this *= n;
-  return *this;
+String operator*(int n, String& str) {
+  String res = str;
+  res *= n;
+  return res;
 }
-
-String& operator*(int n, String& str) {
-  str *= n;
-  return str;
-}
-
-String String::operator*(int n) const {
-  String res(*this);
-  return res * n;
+String operator*(String& str, int n) {
+  String res = str;
+  res *= n;
+  return res;
 }
 
 // TODO

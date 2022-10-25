@@ -100,7 +100,6 @@ class String {
   // Оператор + для конкатенации строк.
   // Например, "ab" + "oba" = "aboba".
   String operator+(const String& other) const;
-  String& operator+(const String& other);
 
   // Оператор += для конкатенации строк.
   // Операция s += t должна работать за O(|t|)!!!
@@ -115,9 +114,9 @@ class String {
   // Загадка о лектора по алгоритмам - не возникло ли у вас
   // аналогии с каким-то известным вам алгоритмом?)
   String& operator*=(int n);
-  String& operator*(int n);
-  friend String& operator*(int n, String& str);
-  String operator*(int n) const;
+  // String operator*(int n) const;
+  friend String operator*(int n, String& str);
+  friend String operator*(String& str, int n);
 
   // Оператор ввода из потока
   friend std::istream& operator>>(std::istream& input, String& s);
