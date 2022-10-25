@@ -218,12 +218,36 @@ String operator*(const String& str, int n) {
   return res;
 }
 
-// TODO
 std::vector<String> String::Split(const String& delim) const {
   std::vector<String> res;
   const String& s = *this;
   if (s.Empty() || delim.Empty()) {
     res.push_back(s);
+  }
+
+  String tmp;
+  size_t j = 0;
+  for (size_t i = 0; i < s.Size(); i++) {
+    tmp.PushBack(s[i]);
+    if (s[i] == delim[j]) {
+      j++;
+      if (j == delim.Size()) {
+        size_t tmp_size = tmp.Size();
+        tmp.Resize(tmp_size - delim.Size());
+        res.push_back(tmp);
+        tmp.Clear();
+        j = 0;
+        if (i == s.Size() - 1) {
+          res.push_back(tmp);
+        }
+      }
+    } else {
+      j = 0;
+    }
+  }
+
+  if (!tmp.Empty()) {
+    res.push_back(tmp);
   }
   return res;
 }
