@@ -228,7 +228,7 @@ std::vector<String> String::Split(const String& delim) const {
   return res;
 }
 
-String String::Join(const std::vector<String>& strings) {
+String String::Join(const std::vector<String>& strings) const {
   String res;
   if (strings.empty()) {
     res.Clear();
