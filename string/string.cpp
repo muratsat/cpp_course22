@@ -221,6 +221,10 @@ String operator*(const String& str, int n) {
 // TODO
 std::vector<String> String::Split(const String& delim) const {
   std::vector<String> res;
+  const String& s = *this;
+  if (s.Empty()) {
+    res.push_back(s);
+  }
   return res;
 }
 
