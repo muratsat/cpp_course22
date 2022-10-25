@@ -207,12 +207,12 @@ String& String::operator*=(int n) {
   return *this;
 }
 
-String operator*(int n, String& str) {
+String operator*(int n, const String& str) {
   String res = str;
   res *= n;
   return res;
 }
-String operator*(String& str, int n) {
+String operator*(const String& str, int n) {
   String res = str;
   res *= n;
   return res;
@@ -221,17 +221,20 @@ String operator*(String& str, int n) {
 // TODO
 std::vector<String> String::Split(const String& delim) const {
   std::vector<String> res;
-  if (delim.Empty()) {
-    res.push_back(*this);
-  }
   return res;
 }
 
-// TODO
 String String::Join(const std::vector<String>& strings) {
-  String res(*this);
+  String res;
   if (strings.empty()) {
     res.Clear();
+    return res;
+  }
+  for (int i = 0; i < strings.size(); i++) {
+    res += strings[i];
+    if (i < strings.size() - 1) {
+      res += *this;
+    }
   }
   return res;
 }

@@ -115,8 +115,8 @@ class String {
   // аналогии с каким-то известным вам алгоритмом?)
   String& operator*=(int n);
   // String operator*(int n) const;
-  friend String operator*(int n, String& str);
-  friend String operator*(String& str, int n);
+  friend String operator*(int n, const String& str);
+  friend String operator*(const String& str, int n);
 
   // Оператор ввода из потока
   friend std::istream& operator>>(std::istream& input, String& s);
