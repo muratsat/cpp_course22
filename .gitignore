@@ -4,3 +4,4 @@ big_integer/*.o
 big_integer/main
 big_integer/main.cpp
 big_integer/tests.cpp
+big_integer/tests

@@ -8,6 +8,9 @@ BigInt::BigInt(int64_t n) {
   if (n == 0) {
     return;
   }
+  if (n < 0) {
+    is_negative_ = true;
+  }
   digits.push_back(n % base_);
   if (n / base_) {
     digits.push_back(n / base_);
@@ -25,7 +28,7 @@ BigInt::BigInt(std::string s) {
 
   for (int i = s.size() - 1; i >= 0; i--) {
     if (s[i] == '-') {
-      is_negative_ = true;
+      is_negative_ = !digits.empty();
       break;
     }
     BigInt to_add = dec * (s[i] - '0');
@@ -46,7 +49,7 @@ void BigInt::AddAbs(const BigInt& to_add) {
       tmp += digits[i];
     }
     if (i < to_add.digits.size()) {
-      tmp += to_add.digits[i];
+      tmp += to_add[i];
     }
 
     digits[i] = tmp % base_;
@@ -66,6 +69,63 @@ void BigInt::Normalize() {
     new_size--;
   }
   digits.resize(new_size);
+  if (digits.empty()) {
+    is_negative_ = false;
+  }
+}
+
+bool operator<(const BigInt& left, const BigInt& right) {
+  if (left.is_negative_ != right.is_negative_) {
+    return left.is_negative_;
+  }
+
+  if (left.Size() != right.Size()) {
+    return (left.Size() < right.Size()) && !left.is_negative_;
+  }
+
+  for (int i = 0; i < left.Size(); i++) {
+    if (left[i] != right[i]) {
+      // 1) numbers are positive
+      // left < right if left[i] > right[i]
+      // 2) numbers are positive
+      // left < right if left[i] < right[i]
+      return !((left[i] < right[i]) ^ !left.is_negative_);
+    }
+  }
+
+  return false;
+}
+
+bool operator>(const BigInt& left, const BigInt& right) { return right < left; }
+
+bool operator<=(const BigInt& left, const BigInt& right) {
+  return !(right > left);
+}
+
+bool operator>=(const BigInt& left, const BigInt& right) {
+  return right <= left;
+}
+
+bool operator==(const BigInt& left, const BigInt& right) {
+  if (left.is_negative_ != right.is_negative_) {
+    return false;
+  }
+
+  if (left.Size() != right.Size()) {
+    return false;
+  }
+
+  for (int i = 0; i < left.Size(); i++) {
+    if (left[i] != right[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool operator!=(const BigInt& left, const BigInt& right) {
+  return !(left == right);
 }
 
 BigInt& BigInt::operator*=(int x) {
