@@ -10,6 +10,8 @@ BigInt::BigInt(int64_t n) {
   }
   if (n < 0) {
     is_negative_ = true;
+    // TODO: handle case n = -2^63
+    n = -n;
   }
   digits.push_back(n % base_);
   if (n / base_) {
@@ -63,6 +65,32 @@ void BigInt::AddAbs(const BigInt& to_add) {
   Normalize();
 }
 
+void BigInt::SubAbs(const BigInt& to_sub) {
+  int cmp = CompareAbs(to_sub);
+  size_t old_size = Size();
+  size_t size = Max(old_size, to_sub.Size());
+  digits.resize(size);
+
+  bool borrowed = false;
+  for (size_t i = 0; i < size; i++) {
+    long long tmp = borrowed ? -1 : 0;
+    borrowed = false;
+    if (i < old_size) {
+      tmp += cmp * (long long)digits[i];
+    }
+    if (i < to_sub.Size()) {
+      tmp -= cmp * (long long)to_sub[i];
+    }
+    if (tmp < 0) {
+      borrowed = true;
+      tmp += base_;
+    }
+    digits[i] = tmp;
+  }
+
+  Normalize();
+}
+
 void BigInt::Normalize() {
   size_t new_size = digits.size();
   while (new_size > 0 && digits[new_size - 1] == 0) {
@@ -72,6 +100,32 @@ void BigInt::Normalize() {
   if (digits.empty()) {
     is_negative_ = false;
   }
+}
+
+BigInt& BigInt::operator+=(const BigInt& other) {
+  if (is_negative_ != other.is_negative_) {
+    if (CompareAbs(other) < 0) {
+      is_negative_ = !is_negative_;
+    }
+    SubAbs(other);
+  } else {
+    AddAbs(other);
+  }
+
+  return *this;
+}
+
+BigInt& BigInt::operator-=(const BigInt& other) {
+  if (is_negative_ == other.is_negative_) {
+    if (CompareAbs(other) < 0) {
+      is_negative_ = !is_negative_;
+    }
+    SubAbs(other);
+  } else {
+    AddAbs(other);
+  }
+
+  return *this;
 }
 
 int BigInt::CompareAbs(const BigInt& other) const {
@@ -147,13 +201,13 @@ BigInt& BigInt::operator*=(int x) {
   return *this;
 }
 
-BigInt operator*(const BigInt big_int, const long long x) {
+BigInt operator*(const BigInt& big_int, const long long x) {
   BigInt res(big_int);
   res *= x;
   return res;
 }
 
-BigInt operator*(const long long x, const BigInt big_int) {
+BigInt operator*(const long long x, const BigInt& big_int) {
   BigInt res(big_int);
   res *= x;
   return res;
