@@ -32,8 +32,8 @@ class BigInt {
     if (big_int.digits.empty()) {
       output << "0";
     }
-    for (auto digit : big_int.digits) {
-      output << digit;
+    for (int i = big_int.Size() - 1; i >= 0; i--) {
+      output << big_int[i];
     }
     return output;
   }
@@ -46,6 +46,20 @@ class BigInt {
 
   unsigned operator[](int i) const { return digits[i]; }
   unsigned& operator[](int i) { return digits[i]; }
+
+  // Compare absolute values
+  //  returns:
+  //  0 if |this| = |other|
+  // -1 if |this| < |other|
+  //  1 if |this| > |other|
+  int CompareAbs(const BigInt& other) const;
+
+  // Compare real values
+  //  returns:
+  //  0 if this = other
+  // -1 if this < other
+  //  1 if this > other
+  int Compare(const BigInt& other) const;
 
   // add absolute values
   void AddAbs(const BigInt& to_add);

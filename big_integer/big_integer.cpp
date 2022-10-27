@@ -74,58 +74,57 @@ void BigInt::Normalize() {
   }
 }
 
-bool operator<(const BigInt& left, const BigInt& right) {
-  if (left.is_negative_ != right.is_negative_) {
-    return left.is_negative_;
+int BigInt::CompareAbs(const BigInt& other) const {
+  if (Size() < other.Size()) {
+    return -1;
+  }
+  if (Size() > other.Size()) {
+    return 1;
   }
 
-  if (left.Size() != right.Size()) {
-    return (left.Size() < right.Size()) && !left.is_negative_;
-  }
-
-  for (int i = 0; i < left.Size(); i++) {
-    if (left[i] != right[i]) {
-      // 1) numbers are positive
-      // left < right if left[i] > right[i]
-      // 2) numbers are positive
-      // left < right if left[i] < right[i]
-      return !((left[i] < right[i]) ^ !left.is_negative_);
+  for (size_t i = 0; i < Size(); i++) {
+    if (digits[i] < other[i]) {
+      return -1;
+    }
+    if (digits[i] > other[i]) {
+      return 1;
     }
   }
 
-  return false;
+  return 0;
 }
 
-bool operator>(const BigInt& left, const BigInt& right) { return right < left; }
+int BigInt::Compare(const BigInt& other) const {
+  if (is_negative_ != other.is_negative_) {
+    return is_negative_ ? -1 : 1;
+  }
+  int cmp = CompareAbs(other);
+  cmp *= is_negative_ ? -1 : 1;
+  return cmp;
+}
+
+bool operator<(const BigInt& left, const BigInt& right) {
+  return left.Compare(right) < 0;
+}
+
+bool operator>(const BigInt& left, const BigInt& right) {
+  return left.Compare(right) > 0;
+}
 
 bool operator<=(const BigInt& left, const BigInt& right) {
-  return !(right > left);
+  return left.Compare(right) <= 0;
 }
 
 bool operator>=(const BigInt& left, const BigInt& right) {
-  return right <= left;
+  return left.Compare(right) >= 0;
 }
 
 bool operator==(const BigInt& left, const BigInt& right) {
-  if (left.is_negative_ != right.is_negative_) {
-    return false;
-  }
-
-  if (left.Size() != right.Size()) {
-    return false;
-  }
-
-  for (int i = 0; i < left.Size(); i++) {
-    if (left[i] != right[i]) {
-      return false;
-    }
-  }
-
-  return true;
+  return left.Compare(right) == 0;
 }
 
 bool operator!=(const BigInt& left, const BigInt& right) {
-  return !(left == right);
+  return left.Compare(right) != 0;
 }
 
 BigInt& BigInt::operator*=(int x) {
