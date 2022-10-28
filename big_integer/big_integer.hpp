@@ -38,16 +38,16 @@ class BigInt {
   }
 
   // Multiply operator
-  BigInt& operator*=(int x);
-  friend BigInt operator*(const BigInt& big_int, const long long x);
-  friend BigInt operator*(const long long x, const BigInt& big_int);
+  BigInt& operator*=(int factor);
+  friend BigInt operator*(const BigInt& big_int, long long factor);
+  friend BigInt operator*(long long factor, const BigInt& big_int);
 
   // Return number of digits in BigInt base
-  size_t Size() const { return digits.size(); }
+  size_t Size() const { return digits_.size(); }
 
   // TODO: change implementation after switching to base 2^32
   friend std::ostream& operator<<(std::ostream& output, const BigInt& big_int) {
-    if (big_int.digits.empty()) {
+    if (big_int.digits_.empty()) {
       output << '0';
     }
     if (big_int.is_negative_) {
@@ -60,13 +60,13 @@ class BigInt {
   }
 
  private:
-  const long long unsigned base_ = 4294967296;
+  const long long unsigned kBase = 4294967296;
   // const long long unsigned base_ = 10;
-  std::vector<unsigned> digits;
+  std::vector<unsigned> digits_;
   bool is_negative_ = false;
 
-  unsigned operator[](int i) const { return digits[i]; }
-  unsigned& operator[](int i) { return digits[i]; }
+  unsigned operator[](int i) const { return digits_[i]; }
+  unsigned& operator[](int i) { return digits_[i]; }
 
   // Compare absolute values
   //  returns:

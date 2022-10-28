@@ -13,14 +13,14 @@ BigInt::BigInt(int64_t n) {
     // TODO: handle case n = -2^63
     n = -n;
   }
-  digits.push_back(n % base_);
-  if (n / base_) {
-    digits.push_back(n / base_);
+  digits_.push_back(n % kBase);
+  if (n / kBase) {
+    digits_.push_back(n / kBase);
   }
 }
 
 BigInt& BigInt::operator=(const BigInt& other) {
-  digits = other.digits;
+  digits_ = other.digits_;
   is_negative_ = other.is_negative_;
   return *this;
 }
@@ -40,37 +40,36 @@ BigInt::BigInt(std::string s, int string_base) {
 
   for (int i = s.size() - 1; i >= 0; i--) {
     if (s[i] == '-') {
-      is_negative_ = !digits.empty();
+      is_negative_ = !digits_.empty();
       break;
     }
-    BigInt to_add = dec;
-    to_add *= DigitValue(s[i]);
+    BigInt to_add = dec * DigitValue(s[i]);
     AddAbs(to_add);
     dec *= string_base;
   }
 }
 
 void BigInt::AddAbs(const BigInt& to_add) {
-  size_t old_size = digits.size();
-  size_t max_size = Max(old_size, to_add.digits.size());
-  digits.resize(max_size);
+  size_t old_size = digits_.size();
+  size_t max_size = Max(old_size, to_add.digits_.size());
+  digits_.resize(max_size);
 
   int64_t carry = 0;
   for (size_t i = 0; i < max_size; i++) {
     int64_t tmp = carry;
     if (i < old_size) {
-      tmp += digits[i];
+      tmp += digits_[i];
     }
-    if (i < to_add.digits.size()) {
+    if (i < to_add.digits_.size()) {
       tmp += to_add[i];
     }
 
-    digits[i] = tmp % base_;
-    carry = tmp / base_;
+    digits_[i] = tmp % kBase;
+    carry = tmp / kBase;
   }
 
   if (carry) {
-    digits.push_back(carry);
+    digits_.push_back(carry);
   }
 
   Normalize();
@@ -80,35 +79,35 @@ void BigInt::SubAbs(const BigInt& to_sub) {
   int cmp = CompareAbs(to_sub);
   size_t old_size = Size();
   size_t size = Max(old_size, to_sub.Size());
-  digits.resize(size);
+  digits_.resize(size);
 
   bool borrowed = false;
   for (size_t i = 0; i < size; i++) {
     long long tmp = borrowed ? -1 : 0;
     borrowed = false;
     if (i < old_size) {
-      tmp += cmp * (long long)digits[i];
+      tmp += cmp * (long long)digits_[i];
     }
     if (i < to_sub.Size()) {
       tmp -= cmp * (long long)to_sub[i];
     }
     if (tmp < 0) {
       borrowed = true;
-      tmp += base_;
+      tmp += kBase;
     }
-    digits[i] = tmp;
+    digits_[i] = tmp;
   }
 
   Normalize();
 }
 
 void BigInt::Normalize() {
-  size_t new_size = digits.size();
-  while (new_size > 0 && digits[new_size - 1] == 0) {
+  size_t new_size = digits_.size();
+  while (new_size > 0 && digits_[new_size - 1] == 0) {
     new_size--;
   }
-  digits.resize(new_size);
-  if (digits.empty()) {
+  digits_.resize(new_size);
+  if (digits_.empty()) {
     is_negative_ = false;
   }
 }
@@ -148,10 +147,10 @@ int BigInt::CompareAbs(const BigInt& other) const {
   }
 
   for (size_t i = 0; i < Size(); i++) {
-    if (digits[i] < other[i]) {
+    if (digits_[i] < other[i]) {
       return -1;
     }
-    if (digits[i] > other[i]) {
+    if (digits_[i] > other[i]) {
       return 1;
     }
   }
@@ -199,26 +198,26 @@ BigInt& BigInt::operator*=(int x) {
   }
 
   int64_t carry = 0;
-  for (int i = 0; i < digits.size(); i++) {
-    int64_t tmp = (int64_t)digits[i] * (int64_t)x + carry;
-    digits[i] = tmp % base_;
-    carry = tmp / base_;
+  for (int i = 0; i < digits_.size(); i++) {
+    int64_t tmp = (int64_t)digits_[i] * (int64_t)x + carry;
+    digits_[i] = tmp % kBase;
+    carry = tmp / kBase;
   }
   if (carry) {
-    digits.push_back(carry);
+    digits_.push_back(carry);
   }
 
   Normalize();
   return *this;
 }
 
-BigInt operator*(const BigInt& big_int, const long long x) {
+BigInt operator*(const BigInt& big_int, long long x) {
   BigInt res(big_int);
   res *= x;
   return res;
 }
 
-BigInt operator*(const long long x, const BigInt& big_int) {
+BigInt operator*(long long x, const BigInt& big_int) {
   BigInt res(big_int);
   res *= x;
   return res;
