@@ -253,7 +253,7 @@ static void Reverse(std::string& s) {
 
 std::string BigInt::ToString(int base) const {
   if (base < 2 || base >= 36) {
-    throw std::invalid_argument("Invalide base");
+    throw std::invalid_argument("Invalid base");
   }
   char char_value[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
                        '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',

@@ -11,6 +11,7 @@ class BigInt {
   BigInt() = default;
   BigInt(int64_t n);
   BigInt(int n) : BigInt((int64_t)n){};
+  BigInt(double d) : BigInt((int64_t)d){};
   explicit BigInt(const std::string& s, int string_base = kDecimalBase);
   BigInt(const char* c_string) : BigInt(std::string(c_string)){};
   BigInt(const BigInt& other) { *this = other; }
@@ -24,6 +25,41 @@ class BigInt {
   friend bool operator!=(const BigInt& left, const BigInt& right);
 
   BigInt& operator=(const BigInt& other);
+
+  BigInt& operator-() {
+    is_negative_ = !is_negative_ && !IsZero();
+    return *this;
+  }
+  BigInt operator-() const {
+    BigInt copy = *this;
+    return -copy;
+  }
+
+  // prefix increment
+  BigInt& operator++() {
+    *this += 1;
+    return *this;
+  }
+
+  // postfix increment
+  BigInt operator++(int) {
+    BigInt tmp = *this;
+    ++*this;
+    return tmp;
+  }
+
+  // prefix decrement
+  BigInt& operator--() {
+    *this -= 1;
+    return *this;
+  }
+
+  // postfix decrement
+  BigInt operator--(int) {
+    BigInt tmp = *this;
+    --*this;
+    return tmp;
+  }
 
   // Plus operator
   BigInt& operator+=(const BigInt& other);
