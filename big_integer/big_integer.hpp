@@ -4,11 +4,15 @@
 #include <string>
 #include <vector>
 
+static const int kDecimalBase = 10;
+
 class BigInt {
  public:
   BigInt() = default;
   BigInt(int64_t n);
-  BigInt(std::string s, int string_base = 10);
+  BigInt(int n) : BigInt((int64_t)n){};
+  explicit BigInt(const std::string& s, int string_base = kDecimalBase);
+  BigInt(const char* c_string) : BigInt(std::string(c_string)){};
   BigInt(const BigInt& other) { *this = other; }
   ~BigInt(){};
 
@@ -38,24 +42,33 @@ class BigInt {
   }
 
   // Multiply operator
+  // multiply by small factor
   BigInt& operator*=(int factor);
   friend BigInt operator*(const BigInt& big_int, long long factor);
   friend BigInt operator*(long long factor, const BigInt& big_int);
 
+  // Division operator
+  // Divide by a small divisor
+  BigInt& operator/=(int divisor);
+
   // Return number of digits in BigInt base
   size_t Size() const { return digits_.size(); }
 
-  // TODO: change implementation after switching to base 2^32
+  bool IsZero() const { return digits_.empty(); }
+
+  // return string representation
+  // in base from 2 to 36 (0 .. 9, a .. z)
+  std::string ToString(int base = kDecimalBase) const;
+
+  friend std::istream& operator>>(std::istream& input, BigInt& big_int) {
+    std::string str;
+    input >> str;
+    big_int = BigInt(str);
+    return input;
+  }
+
   friend std::ostream& operator<<(std::ostream& output, const BigInt& big_int) {
-    if (big_int.digits_.empty()) {
-      output << '0';
-    }
-    if (big_int.is_negative_) {
-      output << '-';
-    }
-    for (int i = big_int.Size() - 1; i >= 0; i--) {
-      output << big_int[i];
-    }
+    output << big_int.ToString();
     return output;
   }
 
@@ -89,6 +102,10 @@ class BigInt {
   // subtract absolute values
   // |this| := ||this| -  |to_sub||
   void SubAbs(const BigInt& to_sub);
+
+  // Unsigned integer division by a small number
+  // returns remainder
+  int Divide(int divisor);
 
   // remove trailling zeros
   void Normalize();

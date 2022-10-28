@@ -35,7 +35,7 @@ static int DigitValue(char digit) {
   return digit - 'A' + 10;
 }
 
-BigInt::BigInt(std::string s, int string_base) {
+BigInt::BigInt(const std::string& s, int string_base) {
   BigInt dec(1);
 
   for (int i = s.size() - 1; i >= 0; i--) {
@@ -221,4 +221,58 @@ BigInt operator*(long long x, const BigInt& big_int) {
   BigInt res(big_int);
   res *= x;
   return res;
+}
+
+int BigInt::Divide(int divisor) {
+  if (divisor == 0) {
+    throw std::invalid_argument("Division by zero");
+  }
+
+  int remainder = 0;
+  for (int i = digits_.size() - 1; i >= 0; i--) {
+    int64_t tmp = kBase * (int64_t)remainder + (int64_t)digits_[i];
+    digits_[i] = tmp / divisor;
+    remainder = tmp % divisor;
+  }
+
+  Normalize();
+  if (remainder < 0) {
+    remainder += divisor;
+  }
+  return remainder;
+}
+
+static void Reverse(std::string& s) {
+  int size = s.size();
+  for (int i = 0; i < size / 2; i++) {
+    char t = s[size - 1 - i];
+    s[size - 1 - i] = s[i];
+    s[i] = t;
+  }
+}
+
+std::string BigInt::ToString(int base) const {
+  if (base < 2 || base >= 36) {
+    throw std::invalid_argument("Invalide base");
+  }
+  char char_value[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
+                       '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                       'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                       'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+  std::string s;
+  BigInt copy = *this;
+
+  int remainder = 0;
+  do {
+    remainder = copy.Divide(base);
+    s.push_back(char_value[remainder]);
+  } while (!copy.IsZero());
+
+  if (is_negative_) {
+    s.push_back('-');
+  }
+
+  Reverse(s);
+
+  return s;
 }
