@@ -80,6 +80,8 @@ class BigInt {
   // Multiply operator
   // multiply by small factor
   BigInt& operator*=(int factor);
+  BigInt& operator*=(const BigInt& factor);
+  friend BigInt operator*(const BigInt& left, const BigInt& right);
   friend BigInt operator*(const BigInt& big_int, long long factor);
   friend BigInt operator*(long long factor, const BigInt& big_int);
 

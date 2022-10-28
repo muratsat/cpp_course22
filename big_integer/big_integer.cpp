@@ -191,6 +191,39 @@ bool operator!=(const BigInt& left, const BigInt& right) {
   return left.Compare(right) != 0;
 }
 
+BigInt& BigInt::operator*=(const BigInt& factor) {
+  is_negative_ = (is_negative_ ^ factor.is_negative_);
+
+  std::vector<unsigned> old_digits = digits_;
+  size_t old_size = Size();
+
+  digits_.clear();
+  digits_.resize(old_size + factor.Size());
+
+  for (size_t i = 0; i < factor.Size(); i++) {
+    unsigned long long tmp, carry = 0;
+    for (size_t j = 0; j < old_size; j++) {
+      tmp = carry;
+      tmp += (unsigned long long)factor[i] * old_digits[j];
+      tmp += (unsigned long long)digits_[i + j];
+      digits_[i + j] = tmp;
+      carry = tmp / kBase;
+    }
+    if (carry) {
+      digits_[i + old_size] = carry;
+    }
+  }
+
+  Normalize();
+  return *this;
+}
+
+BigInt operator*(const BigInt& left, const BigInt& right) {
+  BigInt res = left;
+  res *= right;
+  return res;
+}
+
 BigInt& BigInt::operator*=(int x) {
   if (x < 0) {
     is_negative_ = !is_negative_;
