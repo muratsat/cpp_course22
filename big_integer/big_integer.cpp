@@ -25,7 +25,17 @@ BigInt& BigInt::operator=(const BigInt& other) {
   return *this;
 }
 
-BigInt::BigInt(std::string s) {
+static int DigitValue(char digit) {
+  if ('0' <= digit && digit <= '9') {
+    return digit - '0';
+  }
+  if ('a' <= digit && digit <= 'z') {
+    return digit - 'a' + 10;
+  }
+  return digit - 'A' + 10;
+}
+
+BigInt::BigInt(std::string s, int string_base) {
   BigInt dec(1);
 
   for (int i = s.size() - 1; i >= 0; i--) {
@@ -33,9 +43,10 @@ BigInt::BigInt(std::string s) {
       is_negative_ = !digits.empty();
       break;
     }
-    BigInt to_add = dec * (s[i] - '0');
+    BigInt to_add = dec;
+    to_add *= DigitValue(s[i]);
     AddAbs(to_add);
-    dec *= 10;
+    dec *= string_base;
   }
 }
 
@@ -189,7 +200,7 @@ BigInt& BigInt::operator*=(int x) {
 
   int64_t carry = 0;
   for (int i = 0; i < digits.size(); i++) {
-    int64_t tmp = digits[i] * x + carry;
+    int64_t tmp = (int64_t)digits[i] * (int64_t)x + carry;
     digits[i] = tmp % base_;
     carry = tmp / base_;
   }

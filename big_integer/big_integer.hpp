@@ -8,7 +8,7 @@ class BigInt {
  public:
   BigInt() = default;
   BigInt(int64_t n);
-  BigInt(std::string s);
+  BigInt(std::string s, int string_base = 10);
   BigInt(const BigInt& other) { *this = other; }
   ~BigInt(){};
 
