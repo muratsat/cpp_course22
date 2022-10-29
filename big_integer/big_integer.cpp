@@ -17,11 +17,12 @@ BigInt::BigInt(int64_t n) {
     const long long kTwoTo32 = 4294967296;
     if (kBase == kTwoTo32) {
       digits_.push_back(0);
-      digits_.push_back(1 << 31);
+      digits_.push_back(kTwoTo32 / 2);
       return;
     }
     digits_.push_back(1);
-    for (int i = 0; i < 63; i++) {
+    const int kTotalBits = 63;
+    for (int i = 0; i < kTotalBits; i++) {
       Multiply(2);
     }
     return;
@@ -39,13 +40,14 @@ BigInt& BigInt::operator=(const BigInt& other) {
 }
 
 static int DigitValue(char digit) {
+  int a = 10;
   if ('0' <= digit && digit <= '9') {
     return digit - '0';
   }
   if ('a' <= digit && digit <= 'z') {
-    return digit - 'a' + 10;
+    return digit - 'a' + a;
   }
-  return digit - 'A' + 10;
+  return digit - 'A' + a;
 }
 
 BigInt::BigInt(const std::string& s) {
@@ -88,8 +90,9 @@ void BigInt::Multiply(long long x) {
     digits_[i] = tmp % kBase;
     carry = tmp / kBase;
   }
-  if (carry) {
-    digits_.push_back(carry);
+  if (carry != 0) {
+    digits_.push_back(carry % kBase);
+    carry /= kBase;
   }
 
   Normalize();
@@ -230,7 +233,8 @@ static void Reverse(std::string& s) {
 }
 
 std::string BigInt::ToString(int base) const {
-  if (base < 2 || base >= 36) {
+  const int kMaxBase = 36;
+  if (base < 2 || base >= kMaxBase) {
     throw std::invalid_argument("Invalid base");
   }
   char char_value[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
