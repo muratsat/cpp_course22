@@ -43,7 +43,8 @@ BigInt::BigInt(const std::string& s, int string_base) {
       is_negative_ = !digits_.empty();
       break;
     }
-    BigInt to_add = dec * DigitValue(s[i]);
+    BigInt to_add = dec;
+    to_add.Multiply(DigitValue(s[i]));
     AddAbs(to_add);
     dec *= string_base;
   }
@@ -224,7 +225,7 @@ BigInt operator*(const BigInt& left, const BigInt& right) {
   return res;
 }
 
-BigInt& BigInt::operator*=(int x) {
+void BigInt::Multiply(long long x) {
   if (x < 0) {
     is_negative_ = !is_negative_;
     x = -x;
@@ -241,22 +242,9 @@ BigInt& BigInt::operator*=(int x) {
   }
 
   Normalize();
-  return *this;
 }
 
-BigInt operator*(const BigInt& big_int, long long x) {
-  BigInt res(big_int);
-  res *= x;
-  return res;
-}
-
-BigInt operator*(long long x, const BigInt& big_int) {
-  BigInt res(big_int);
-  res *= x;
-  return res;
-}
-
-int BigInt::Divide(int divisor) {
+int BigInt::Divide(long long divisor) {
   if (divisor == 0) {
     throw std::invalid_argument("Division by zero");
   }

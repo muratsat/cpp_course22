@@ -11,6 +11,7 @@ class BigInt {
   BigInt() = default;
   BigInt(int64_t n);
   BigInt(int n) : BigInt((int64_t)n){};
+  BigInt(unsigned n) : BigInt((int64_t)n){};
   BigInt(double d) : BigInt((int64_t)d){};
   explicit BigInt(const std::string& s, int string_base = kDecimalBase);
   BigInt(const char* c_string) : BigInt(std::string(c_string)){};
@@ -79,15 +80,12 @@ class BigInt {
 
   // Multiply operator
   // multiply by small factor
-  BigInt& operator*=(int factor);
   BigInt& operator*=(const BigInt& factor);
   friend BigInt operator*(const BigInt& left, const BigInt& right);
-  friend BigInt operator*(const BigInt& big_int, long long factor);
-  friend BigInt operator*(long long factor, const BigInt& big_int);
 
   // Division operator
-  // Divide by a small divisor
-  BigInt& operator/=(int divisor);
+  BigInt& operator/=(const BigInt& divisor);
+  friend BigInt operator/(const BigInt& left, const BigInt& right);
 
   // Return number of digits in BigInt base
   size_t Size() const { return digits_.size(); }
@@ -97,6 +95,17 @@ class BigInt {
   // return string representation
   // in base from 2 to 36 (0 .. 9, a .. z)
   std::string ToString(int base = kDecimalBase) const;
+
+  BigInt& Abs() {
+    is_negative_ = false;
+    return *this;
+  }
+
+  BigInt Abs() const {
+    BigInt abs = *this;
+    abs.is_negative_ = false;
+    return abs;
+  }
 
   friend std::istream& operator>>(std::istream& input, BigInt& big_int) {
     std::string str;
@@ -112,7 +121,7 @@ class BigInt {
 
  private:
   const long long unsigned kBase = 4294967296;
-  // const long long unsigned base_ = 10;
+  // const long long unsigned kBase = 10;
   std::vector<unsigned> digits_;
   bool is_negative_ = false;
 
@@ -141,9 +150,23 @@ class BigInt {
   // |this| := ||this| -  |to_sub||
   void SubAbs(const BigInt& to_sub);
 
+  void Multiply(long long x);
+
   // Unsigned integer division by a small number
   // returns remainder
-  int Divide(int divisor);
+  int Divide(long long divisor);
+
+  void DivideAbsolute(const BigInt& divisor, bool is_remainder = false);
+
+  void LongDivision(const BigInt& divisor, bool is_remainder = false);
+
+  void ShiftLeft();
+
+  // when dividend and divisor have same size
+  // or their sizes differ by 1
+  // the result is a small number
+  // that can be found using binary search in O(log(BASE))
+  friend unsigned DivideSameSize(const BigInt& dividend, const BigInt& divisor);
 
   // remove trailling zeros
   void Normalize();
