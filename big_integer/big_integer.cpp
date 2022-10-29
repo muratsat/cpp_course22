@@ -40,14 +40,14 @@ BigInt& BigInt::operator=(const BigInt& other) {
 }
 
 static int DigitValue(char digit) {
-  int a = 10;
+  const int kValueOfA = 10;
   if ('0' <= digit && digit <= '9') {
     return digit - '0';
   }
   if ('a' <= digit && digit <= 'z') {
-    return digit - 'a' + a;
+    return digit - 'a' + kValueOfA;
   }
-  return digit - 'A' + a;
+  return digit - 'A' + kValueOfA;
 }
 
 BigInt::BigInt(const std::string& s) {
@@ -136,7 +136,7 @@ void BigInt::AddAbs(const BigInt& to_add) {
     carry = tmp / kBase;
   }
 
-  while (carry) {
+  while (carry != 0) {
     digits_.push_back(carry % kBase);
     carry /= kBase;
   }
