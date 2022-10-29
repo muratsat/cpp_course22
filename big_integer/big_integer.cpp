@@ -10,12 +10,25 @@ BigInt::BigInt(int64_t n) {
   }
   if (n < 0) {
     is_negative_ = true;
-    // TODO: handle case n = -2^63
     n = -n;
   }
-  digits_.push_back(n % kBase);
-  if (n / kBase) {
-    digits_.push_back(n / kBase);
+  if (n == -n) {
+    is_negative_ = true;
+    const long long kTwoTo32 = 4294967296;
+    if (kBase == kTwoTo32) {
+      digits_.push_back(0);
+      digits_.push_back(1 << 31);
+      return;
+    }
+    digits_.push_back(1);
+    for (int i = 0; i < 63; i++) {
+      Multiply(2);
+    }
+    return;
+  }
+  while (n != 0) {
+    digits_.push_back(n % kBase);
+    n /= kBase;
   }
 }
 
@@ -35,8 +48,9 @@ static int DigitValue(char digit) {
   return digit - 'A' + 10;
 }
 
-BigInt::BigInt(const std::string& s, int string_base) {
-  BigInt dec(1);
+BigInt::BigInt(const std::string& s) {
+  BigInt dec = 1;
+  const int kDecimalBase = 10;
 
   for (int i = s.size() - 1; i >= 0; i--) {
     if (s[i] == '-') {
@@ -46,8 +60,58 @@ BigInt::BigInt(const std::string& s, int string_base) {
     BigInt to_add = dec;
     to_add.Multiply(DigitValue(s[i]));
     AddAbs(to_add);
-    dec *= string_base;
+    dec.Multiply(kDecimalBase);
   }
+  Normalize();
+}
+
+void BigInt::Normalize() {
+  size_t new_size = digits_.size();
+  while (new_size > 0 && digits_[new_size - 1] == 0) {
+    new_size--;
+  }
+  digits_.resize(new_size);
+  if (digits_.empty()) {
+    is_negative_ = false;
+  }
+}
+
+void BigInt::Multiply(long long x) {
+  if (x < 0) {
+    is_negative_ = !is_negative_;
+    x = -x;
+  }
+
+  int64_t carry = 0;
+  for (int i = 0; i < digits_.size(); i++) {
+    int64_t tmp = (int64_t)digits_[i] * (int64_t)x + carry;
+    digits_[i] = tmp % kBase;
+    carry = tmp / kBase;
+  }
+  if (carry) {
+    digits_.push_back(carry);
+  }
+
+  Normalize();
+}
+
+int BigInt::Divide(long long divisor) {
+  if (divisor == 0) {
+    throw std::invalid_argument("Division by zero");
+  }
+
+  int remainder = 0;
+  for (int i = digits_.size() - 1; i >= 0; i--) {
+    int64_t tmp = kBase * (int64_t)remainder + (int64_t)digits_[i];
+    digits_[i] = tmp / divisor;
+    remainder = tmp % divisor;
+  }
+
+  Normalize();
+  if (remainder < 0) {
+    remainder += divisor;
+  }
+  return remainder;
 }
 
 void BigInt::AddAbs(const BigInt& to_add) {
@@ -69,8 +133,9 @@ void BigInt::AddAbs(const BigInt& to_add) {
     carry = tmp / kBase;
   }
 
-  if (carry) {
-    digits_.push_back(carry);
+  while (carry) {
+    digits_.push_back(carry % kBase);
+    carry /= kBase;
   }
 
   Normalize();
@@ -100,43 +165,6 @@ void BigInt::SubAbs(const BigInt& to_sub) {
   }
 
   Normalize();
-}
-
-void BigInt::Normalize() {
-  size_t new_size = digits_.size();
-  while (new_size > 0 && digits_[new_size - 1] == 0) {
-    new_size--;
-  }
-  digits_.resize(new_size);
-  if (digits_.empty()) {
-    is_negative_ = false;
-  }
-}
-
-BigInt& BigInt::operator+=(const BigInt& other) {
-  if (is_negative_ != other.is_negative_) {
-    if (CompareAbs(other) < 0) {
-      is_negative_ = !is_negative_;
-    }
-    SubAbs(other);
-  } else {
-    AddAbs(other);
-  }
-
-  return *this;
-}
-
-BigInt& BigInt::operator-=(const BigInt& other) {
-  if (is_negative_ == other.is_negative_) {
-    if (CompareAbs(other) < 0) {
-      is_negative_ = !is_negative_;
-    }
-    SubAbs(other);
-  } else {
-    AddAbs(other);
-  }
-
-  return *this;
 }
 
 int BigInt::CompareAbs(const BigInt& other) const {
@@ -192,77 +220,6 @@ bool operator!=(const BigInt& left, const BigInt& right) {
   return left.Compare(right) != 0;
 }
 
-BigInt& BigInt::operator*=(const BigInt& factor) {
-  is_negative_ = (is_negative_ ^ factor.is_negative_);
-
-  std::vector<unsigned> old_digits = digits_;
-  size_t old_size = Size();
-
-  digits_.clear();
-  digits_.resize(old_size + factor.Size());
-
-  for (size_t i = 0; i < factor.Size(); i++) {
-    unsigned long long tmp, carry = 0;
-    for (size_t j = 0; j < old_size; j++) {
-      tmp = carry;
-      tmp += (unsigned long long)factor[i] * old_digits[j];
-      tmp += (unsigned long long)digits_[i + j];
-      digits_[i + j] = tmp;
-      carry = tmp / kBase;
-    }
-    if (carry) {
-      digits_[i + old_size] = carry;
-    }
-  }
-
-  Normalize();
-  return *this;
-}
-
-BigInt operator*(const BigInt& left, const BigInt& right) {
-  BigInt res = left;
-  res *= right;
-  return res;
-}
-
-void BigInt::Multiply(long long x) {
-  if (x < 0) {
-    is_negative_ = !is_negative_;
-    x = -x;
-  }
-
-  int64_t carry = 0;
-  for (int i = 0; i < digits_.size(); i++) {
-    int64_t tmp = (int64_t)digits_[i] * (int64_t)x + carry;
-    digits_[i] = tmp % kBase;
-    carry = tmp / kBase;
-  }
-  if (carry) {
-    digits_.push_back(carry);
-  }
-
-  Normalize();
-}
-
-int BigInt::Divide(long long divisor) {
-  if (divisor == 0) {
-    throw std::invalid_argument("Division by zero");
-  }
-
-  int remainder = 0;
-  for (int i = digits_.size() - 1; i >= 0; i--) {
-    int64_t tmp = kBase * (int64_t)remainder + (int64_t)digits_[i];
-    digits_[i] = tmp / divisor;
-    remainder = tmp % divisor;
-  }
-
-  Normalize();
-  if (remainder < 0) {
-    remainder += divisor;
-  }
-  return remainder;
-}
-
 static void Reverse(std::string& s) {
   int size = s.size();
   for (int i = 0; i < size / 2; i++) {
@@ -297,3 +254,96 @@ std::string BigInt::ToString(int base) const {
 
   return s;
 }
+
+BigInt& BigInt::operator-() {
+  is_negative_ = !is_negative_ && !digits_.empty();
+  return *this;
+}
+
+BigInt BigInt::operator-() const {
+  BigInt result = *this;
+  result.is_negative_ = !is_negative_ && !digits_.empty();
+  return result;
+}
+
+BigInt& BigInt::operator+=(const BigInt& other) {
+  if (is_negative_ == other.is_negative_) {
+    AddAbs(other);
+  } else {
+    if (CompareAbs(other) < 0) {
+      is_negative_ = !is_negative_;
+    }
+    SubAbs(other);
+  }
+  return *this;
+}
+
+BigInt& BigInt::operator-=(const BigInt& other) {
+  if (is_negative_ != other.is_negative_) {
+    AddAbs(other);
+  } else {
+    if (CompareAbs(other) < 0) {
+      is_negative_ = !is_negative_;
+    }
+    SubAbs(other);
+  }
+  return *this;
+}
+
+BigInt operator+(const BigInt& left, const BigInt& right) {
+  BigInt result = left;
+  result += right;
+  return result;
+}
+
+BigInt operator-(const BigInt& left, const BigInt& right) {
+  BigInt result = left;
+  result -= right;
+  return result;
+}
+
+BigInt& BigInt::operator++() {
+  *this += 1;
+  return *this;
+}
+
+BigInt& BigInt::operator--() {
+  *this -= 1;
+  return *this;
+}
+
+BigInt BigInt::operator++(int) {
+  BigInt copy = *this;
+  ++(*this);
+  return copy;
+}
+
+BigInt BigInt::operator--(int) {
+  BigInt copy = *this;
+  --(*this);
+  return copy;
+}
+
+BigInt operator*(const BigInt& left, const BigInt& right) {
+  BigInt result = left;
+  result *= right;
+  return result;
+}
+
+BigInt operator/(const BigInt& left, const BigInt& right) {
+  BigInt result = left;
+  result *= right;
+  return result;
+}
+
+BigInt operator%(const BigInt& left, const BigInt& right) {
+  BigInt result = left;
+  result *= right;
+  return result;
+}
+
+BigInt& BigInt::operator*=(const BigInt& factor) { return *this; }
+
+BigInt& BigInt::operator/=(const BigInt& divisor) { return *this; }
+
+BigInt& BigInt::operator%=(const BigInt& divisor) { return *this; }
