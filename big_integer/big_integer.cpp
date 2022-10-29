@@ -21,8 +21,8 @@ BigInt::BigInt(int64_t n) {
       return;
     }
     digits_.push_back(1);
-    const int kTotalBits = 63;
-    for (int i = 0; i < kTotalBits; i++) {
+    const size_t kTotalBits = 63;
+    for (size_t i = 0; i < kTotalBits; i++) {
       Multiply(2);
     }
     return;
@@ -54,7 +54,7 @@ BigInt::BigInt(const std::string& s) {
   BigInt dec = 1;
   const int kDecimalBase = 10;
 
-  for (int i = s.size() - 1; i >= 0; i--) {
+  for (size_t i = s.size() - 1; i >= 0; i--) {
     if (s[i] == '-') {
       is_negative_ = !digits_.empty();
       break;
@@ -85,7 +85,7 @@ void BigInt::Multiply(long long x) {
   }
 
   int64_t carry = 0;
-  for (int i = 0; i < digits_.size(); i++) {
+  for (size_t i = 0; i < digits_.size(); i++) {
     int64_t tmp = (int64_t)digits_[i] * (int64_t)x + carry;
     digits_[i] = tmp % kBase;
     carry = tmp / kBase;
@@ -104,7 +104,7 @@ int BigInt::Divide(long long divisor) {
   }
 
   int remainder = 0;
-  for (int i = digits_.size() - 1; i >= 0; i--) {
+  for (size_t i = digits_.size() - 1; i >= 0; i--) {
     int64_t tmp = kBase * (int64_t)remainder + (int64_t)digits_[i];
     digits_[i] = tmp / divisor;
     remainder = tmp % divisor;
@@ -224,8 +224,8 @@ bool operator!=(const BigInt& left, const BigInt& right) {
 }
 
 static void Reverse(std::string& s) {
-  int size = s.size();
-  for (int i = 0; i < size / 2; i++) {
+  size_t size = s.size();
+  for (size_t i = 0; i < size / 2; i++) {
     char t = s[size - 1 - i];
     s[size - 1 - i] = s[i];
     s[i] = t;
