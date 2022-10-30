@@ -54,7 +54,7 @@ BigInt::BigInt(const std::string& s) {
   BigInt dec = 1;
   const int kDecimalBase = 10;
 
-  for (size_t i = s.size() - 1; i >= 0; i--) {
+  for (int i = s.size() - 1; i >= 0; i--) {
     if (s[i] == '-') {
       is_negative_ = !digits_.empty();
       break;
@@ -90,7 +90,7 @@ void BigInt::Multiply(long long x) {
     digits_[i] = tmp % kBase;
     carry = tmp / kBase;
   }
-  if (carry != 0) {
+  while (carry != 0) {
     digits_.push_back(carry % kBase);
     carry /= kBase;
   }
@@ -104,7 +104,7 @@ int BigInt::Divide(long long divisor) {
   }
 
   int remainder = 0;
-  for (size_t i = digits_.size() - 1; i >= 0; i--) {
+  for (int i = digits_.size() - 1; i >= 0; i--) {
     int64_t tmp = kBase * (int64_t)remainder + (int64_t)digits_[i];
     digits_[i] = tmp / divisor;
     remainder = tmp % divisor;
@@ -178,7 +178,7 @@ int BigInt::CompareAbs(const BigInt& other) const {
     return 1;
   }
 
-  for (size_t i = 0; i < Size(); i++) {
+  for (int i = Size() - 1; i >= 0; i--) {
     if (digits_[i] < other[i]) {
       return -1;
     }
@@ -336,18 +336,107 @@ BigInt operator*(const BigInt& left, const BigInt& right) {
 
 BigInt operator/(const BigInt& left, const BigInt& right) {
   BigInt result = left;
-  result *= right;
+  result /= right;
   return result;
 }
 
 BigInt operator%(const BigInt& left, const BigInt& right) {
   BigInt result = left;
-  result *= right;
+  result %= right;
   return result;
 }
 
-BigInt& BigInt::operator*=(const BigInt& factor) { return *this; }
+BigInt& BigInt::operator*=(const BigInt& factor) {
+  size_t old_size = Size();
+  std::vector<unsigned> old_digits = digits_;
 
-BigInt& BigInt::operator/=(const BigInt& divisor) { return *this; }
+  digits_.clear();
+  digits_.resize(old_size + factor.Size());
 
-BigInt& BigInt::operator%=(const BigInt& divisor) { return *this; }
+  is_negative_ = is_negative_ ^ factor.is_negative_;
+
+  for (size_t i = 0; i < factor.Size(); i++) {
+    long long carry = 0;
+    for (size_t j = 0; j < old_size; j++) {
+      long long tmp = carry;
+      tmp += (long long)digits_[i + j];
+      tmp += (long long)old_digits[j] * (long long)factor[i];
+      digits_[i + j] = tmp % kBase;
+      carry = tmp / kBase;
+    }
+    if (carry != 0) {
+      digits_[i + old_size] = carry;
+    }
+  }
+
+  Normalize();
+  return *this;
+}
+
+static unsigned DivideBinSearch(const BigInt& dividend, const BigInt& divisor) {
+  long long left = 0;
+  long long right = BigInt::kBase;
+
+  while (left + 1 < right) {
+    long long mid = left + (right - left) / 2;
+    BigInt tmp = divisor * mid;
+    if (tmp.CompareAbs(dividend) <= 0) {
+      left = mid;
+    } else {
+      right = mid;
+    }
+  }
+
+  return left;
+}
+
+void BigInt::DivideAbs(const BigInt& divisor, bool is_remainder) {
+  if (divisor.IsZero()) {
+    throw std::invalid_argument("Division by zero");
+  }
+  if (CompareAbs(divisor) < 0) {
+    if (!is_remainder) {
+      digits_.clear();
+    }
+    return;
+  }
+
+  BigInt remainder;
+  BigInt quotient;
+  quotient.digits_.resize(Size());
+  for (int i = Size() - 1; i >= 0; i--) {
+    remainder.ShiftLeft();
+    remainder.digits_[0] = digits_[i];
+    remainder.Normalize();
+    unsigned digit = DivideBinSearch(remainder, divisor);
+    quotient[i] = digit;
+    remainder -= divisor * digit;
+  }
+
+  quotient.Normalize();
+  remainder.Normalize();
+  if (is_remainder) {
+    *this = remainder;
+  } else {
+    *this = quotient;
+  }
+}
+
+BigInt& BigInt::operator/=(const BigInt& divisor) {
+  if (divisor.IsZero()) {
+    throw std::invalid_argument("Division by zero");
+  }
+
+  bool is_result_negative = is_negative_ ^ divisor.is_negative_;
+  BigInt div = divisor.Abs();
+  DivideAbs(div);
+  is_negative_ = is_result_negative && !IsZero();
+
+  return *this;
+}
+
+BigInt& BigInt::operator%=(const BigInt& divisor) {
+  BigInt quotient = *this / divisor;
+  *this -= quotient * divisor;
+  return *this;
+}

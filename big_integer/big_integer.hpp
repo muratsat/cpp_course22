@@ -8,12 +8,12 @@ static const int kDecimalBase = 10;
 
 class BigInt {
  public:
-  // static const long long kBase = 4294967296;
-  static const long long kBase = 10;
+  static const long long kBase = 1000000000;
 
   BigInt() = default;
   BigInt(int64_t n);
   BigInt(int n) : BigInt((int64_t)n) {}
+  BigInt(long long n) : BigInt((int64_t)n) {}
   BigInt(unsigned n) : BigInt((int64_t)n) {}
   BigInt(double n) : BigInt((int64_t)n) {}
   BigInt(const std::string& s);
@@ -101,17 +101,6 @@ class BigInt {
     return abs;
   }
 
- private:
-  // static const long long unsigned kBase = 10;
-  std::vector<unsigned> digits_;
-  bool is_negative_ = false;
-
-  unsigned operator[](int i) const { return digits_[i]; }
-  unsigned& operator[](int i) { return digits_[i]; }
-
-  // remove trailling zeros
-  void Normalize();
-
   // Compare absolute values
   //  returns:
   //  0 if |this| = |other|
@@ -125,6 +114,17 @@ class BigInt {
   // -1 if this < other
   //  1 if this > other
   int Compare(const BigInt& other) const;
+
+ private:
+  // static const long long unsigned kBase = 10;
+  std::vector<unsigned> digits_;
+  bool is_negative_ = false;
+
+  unsigned operator[](int i) const { return digits_[i]; }
+  unsigned& operator[](int i) { return digits_[i]; }
+
+  // remove trailling zeros
+  void Normalize();
 
   // add absolute values
   // |this| := |this| + |to_add|
@@ -140,4 +140,12 @@ class BigInt {
   // Unsigned integer division by a small number
   // returns remainder
   int Divide(long long divisor);
+
+  // Absolute division
+  // |this| := |this| / |divisor|
+  // if is_remainder is true, then
+  // |this| := |this| % |divisor|
+  void DivideAbs(const BigInt& divisor, bool is_remainder = false);
+
+  void ShiftLeft() { digits_.insert(digits_.begin(), 0); }
 };
