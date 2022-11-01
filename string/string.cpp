@@ -3,20 +3,6 @@
 #include <cstring>
 #include <vector>
 
-// Оказыватся, что, если при каждом переполнении массива увеличивать его
-// вместимость в константное число раз, то можно добиться линейной зависимости
-// числа операций над массивом от числа добавляемых элементов
-// (https://en.wikipedia.org/wiki/Dynamic_array#Geometric_expansion_and_amortized_cost).
-// В вашем решении будет проверяться корректность работы данной схемы при
-// множителе равном
-// 2 (то есть, если фактический размер изменяется так:
-// 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> ...,
-// то вместимость меняется следующим образом:
-// 0 -> 1 -> 2 -> 4 -> 4 -> 8 -> ...).
-static const int kMultipler = 2;
-
-static const char kStringTerminator = '\0';
-
 static int Max(int a, int b) { return a > b ? a : b; }
 
 String::~String() {
@@ -56,14 +42,15 @@ void String::PushBack(char character) {
 void String::PopBack() { Resize(Max(size_ - 1, 0)); }
 
 void String::Resize(size_t new_size) {
-  size_t new_capacity = Max(new_size + 1, size_ * kMultipler);
+  const int kMultiplier = 2;
+  size_t new_capacity = Max(new_size + 1, size_ * kMultiplier);
   Reserve(new_capacity);
   new_capacity = Capacity();
   if (new_capacity > new_size) {
-    memset(s_ + new_size, kStringTerminator, new_capacity - new_size);
+    memset(s_ + new_size, '\0', new_capacity - new_size);
   }
   size_ = new_size;
-  s_[size_] = kStringTerminator;
+  s_[size_] = '\0';
 }
 
 void String::Resize(size_t new_size, char character) {
@@ -72,7 +59,7 @@ void String::Resize(size_t new_size, char character) {
     memset(s_ + size_, character, new_size - size_);
   }
   size_ = new_size;
-  s_[size_] = kStringTerminator;
+  s_[size_] = '\0';
 }
 
 void String::Reserve(size_t new_capacity) {
@@ -155,7 +142,7 @@ bool operator!=(const String& s1, const String& s2) { return !(s1 == s2); }
 std::istream& operator>>(std::istream& input, String& s) {
   s.Clear();
   char c = 0;
-  while (c == ' ' || c == kStringTerminator) {
+  while (c == ' ' || c == '\0') {
     input.get(c);
   }
 
