@@ -1,6 +1,8 @@
 #include "big_integer.hpp"
 
 #include <iostream>
+#include <numeric>
+#include <type_traits>
 
 static int Max(int a, int b) { return a > b ? a : b; }
 
@@ -8,24 +10,19 @@ BigInt::BigInt(int64_t n) {
   if (n == 0) {
     return;
   }
-  if (n < 0) {
+  const int64_t kTwoTo63 = 0x8000000000000000;
+  if (n == kTwoTo63) {
     is_negative_ = true;
-    n = -n;
-  }
-  if (n == -n) {
-    is_negative_ = true;
-    const long long kTwoTo32 = 4294967296;
-    if (kBase == kTwoTo32) {
-      digits_.push_back(0);
-      digits_.push_back(kTwoTo32 / 2);
-      return;
-    }
     digits_.push_back(1);
     const size_t kTotalBits = 63;
     for (size_t i = 0; i < kTotalBits; i++) {
       Multiply(2);
     }
     return;
+  }
+  if (n < 0) {
+    is_negative_ = true;
+    n = -n;
   }
   while (n != 0) {
     digits_.push_back(n % kBase);
