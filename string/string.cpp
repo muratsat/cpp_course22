@@ -42,13 +42,7 @@ void String::PushBack(char character) {
 void String::PopBack() { Resize(Max(size_ - 1, 0)); }
 
 void String::Resize(size_t new_size) {
-  const int kMultiplier = 2;
-  size_t new_capacity = Max(new_size + 1, size_ * kMultiplier);
-  Reserve(new_capacity);
-  new_capacity = Capacity();
-  if (new_capacity > new_size) {
-    memset(s_ + new_size, '\0', new_capacity - new_size);
-  }
+  Reserve(new_size + 1);
   size_ = new_size;
   s_[size_] = '\0';
 }
@@ -69,6 +63,7 @@ void String::Reserve(size_t new_capacity) {
   if (capacity_ == 0) {
     s_ = (char*)malloc(new_capacity);
   } else {
+    new_capacity = Max(new_capacity, capacity_ * 2);
     s_ = (char*)realloc(s_, new_capacity);
     if (capacity_ < new_capacity) {
       memset((void*)(Data() + capacity_), 0, new_capacity - capacity_);
@@ -159,9 +154,7 @@ std::istream& operator>>(std::istream& input, String& s) {
 }
 
 std::ostream& operator<<(std::ostream& output, const String& s) {
-  for (size_t i = 0; i < s.Size(); i++) {
-    output << s[i];
-  }
+  output << s.Data();
   return output;
 }
 
