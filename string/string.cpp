@@ -5,11 +5,7 @@
 
 static int Max(int a, int b) { return a > b ? a : b; }
 
-String::~String() {
-  if (s_ != nullptr) {
-    free(s_);
-  }
-}
+String::~String() { delete[] s_; }
 
 String::String(size_t size, char character) { Resize(size, character); }
 
@@ -60,21 +56,25 @@ void String::Reserve(size_t new_capacity) {
   if (new_capacity <= capacity_) {
     return;
   }
-  if (capacity_ == 0) {
-    s_ = (char*)malloc(new_capacity);
-  } else {
-    new_capacity = Max(new_capacity, capacity_ * 2);
-    s_ = (char*)realloc(s_, new_capacity);
-    if (capacity_ < new_capacity) {
-      memset((void*)(Data() + capacity_), 0, new_capacity - capacity_);
-    }
+  new_capacity = Max(new_capacity, capacity_ * 2);
+  char* old = s_;
+  s_ = new char[new_capacity + 1]();
+  if (size_ != 0) {
+    memcpy(s_, old, size_);
   }
+  delete[] old;
+
   capacity_ = new_capacity;
 }
 
 void String::ShrinkToFit() {
   if (capacity_ > size_) {
-    s_ = (char*)realloc(s_, size_);
+    char* old = s_;
+    s_ = new char[size_ + 1]();
+    if (size_ != 0) {
+      memcpy(s_, old, size_);
+    }
+    delete[] old;
     capacity_ = size_;
   }
 }
