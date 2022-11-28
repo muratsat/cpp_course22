@@ -160,3 +160,4 @@ class Matrix {
 
   // Оператор проверки на равенство.
   bool operator==(const Matrix& to_cmp) const { return data_ == to_cmp.data_; }
+};
