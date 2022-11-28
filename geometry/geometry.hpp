@@ -12,7 +12,7 @@ class Vector {
   ~Vector() {}
 
   // Оператор * для скалярного произведения
-  int64_t operator*(const Vector& v) { return x_ * v.x_ + y_ * v.y_; }
+  int64_t operator*(const Vector& v) const { return x_ * v.x_ + y_ * v.y_; }
 
   // Оператор ^ для векторного произведения
   // this(x1, y1),  v(x2, y2)
@@ -88,6 +88,7 @@ class Vector {
   int64_t x_ = 0;
   int64_t y_ = 0;
 };
+
 class Point;
 
 class Segment;
