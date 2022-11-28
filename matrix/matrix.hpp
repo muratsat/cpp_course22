@@ -3,14 +3,14 @@
 #include <algorithm>
 #include <vector>
 
-template <size_t N, size_t M, typename T = int64_t>
+template <size_t n, size_t m, typename T = int64_t>
 class Matrix {
  public:
   // Конструктор по умолчанию заполняет матрицу T().
   Matrix() {
-    data_.resize(N);
+    data_.resize(n);
     for (std::vector<T>& row : data_) {
-      row.resize(M);
+      row.resize(m);
     }
   }
 
@@ -19,17 +19,17 @@ class Matrix {
   // Гарантируется, что размеры вектора будут
   // совпадать с размерами в шаблонах.
   Matrix(const std::vector<std::vector<T>>& init_vector) {
-    data_.resize(N);
-    for (size_t i = 0; i < N; i++) {
+    data_.resize(n);
+    for (size_t i = 0; i < n; i++) {
       data_[i] = init_vector[i];
     }
   }
 
   // Конструктор от T elem. Заполняет всю матрицу elem.
   Matrix(const T& elem) {
-    data_.resize(N);
+    data_.resize(n);
     for (std::vector<T>& row : data_) {
-      row.resize(M, elem);
+      row.resize(m, elem);
     }
   }
 
@@ -45,8 +45,8 @@ class Matrix {
 
   // Операторы +=
   Matrix& operator+=(const Matrix& to_add) {
-    for (size_t i = 0; i < N; i++) {
-      for (size_t j = 0; j < M; j++) {
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < m; j++) {
         data_[i][j] += to_add.data_[i][j];
       }
     }
@@ -69,8 +69,8 @@ class Matrix {
 
   // Вычитание
   Matrix& operator-=(const Matrix& to_sub) {
-    for (size_t i = 0; i < N; i++) {
-      for (size_t j = 0; j < M; j++) {
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < m; j++) {
         data_[i][j] -= to_sub.data_[i][j];
       }
     }
@@ -107,25 +107,25 @@ class Matrix {
   // Умножение двух матриц.
   // Попытка перемножить матрицы несоответствующих размеров
   // должна приводить к ошибке компиляции.
-  template <size_t K>
-  Matrix<N, K, T> operator*(const Matrix<M, K, T>& factor) const {
-    Matrix<N, K, T> result;
-    for (size_t i = 0; i < N; i++) {
-      for (size_t j = 0; j < K; j++) {
-        for (size_t k = 0; k < M; k++) {
-          result[i][j] += data_[i][k] * factor[k][j];
+  template <size_t k>
+  Matrix<n, k, T> operator*(const Matrix<m, k, T>& factor) const {
+    Matrix<n, k, T> result;
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < k; j++) {
+        for (size_t l = 0; l < m; l++) {
+          result[i][j] += data_[i][l] * factor[l][j];
         }
       }
     }
     return result;
   }
 
-  template <size_t K>
-  Matrix operator*=(const Matrix<M, K, T>& factor) {
+  template <size_t k>
+  Matrix operator*=(const Matrix<m, k, T>& factor) {
     Matrix result = *this * factor;
 
-    data_.resize(N);
-    for (size_t i = 0; i < N; i++) {
+    data_.resize(n);
+    for (size_t i = 0; i < n; i++) {
       data_[i] = result[i];
     }
 
@@ -133,10 +133,10 @@ class Matrix {
   }
 
   // Метод Transposed(), возвращающий транспонированную матрицу.
-  Matrix<M, N, T> Transposed() const {
-    Matrix<M, N, T> transposed;
-    for (size_t i = 0; i < N; i++) {
-      for (size_t j = 0; j < M; j++) {
+  Matrix<m, n, T> Transposed() const {
+    Matrix<m, n, T> transposed;
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < m; j++) {
         transposed[j][i] = data_[i][j];
       }
     }
@@ -146,10 +146,10 @@ class Matrix {
   // Метод Trace() - вычислить след матрицы.
   // Вычисление следа от неквадратной
   // матрицы не должно компилироваться.
-  template <typename = std::enable_if<N == M>>
-  T Trace() const requires(N == M) {
+  // template <typename = std::enable_if<n == m>>
+  T Trace() const requires(n == m) {
     T result;
-    for (size_t i = 0; i < N; i++) {
+    for (size_t i = 0; i < n; i++) {
       result += data_[i][i];
     }
     return result;
