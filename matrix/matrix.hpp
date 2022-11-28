@@ -147,8 +147,7 @@ class Matrix {
   // Вычисление следа от неквадратной
   // матрицы не должно компилироваться.
   template <typename = std::enable_if<N == M>>
-  T Trace() const;
-  requires(N == M) {
+  T Trace() const {
     T result;
     for (size_t i = 0; i < N; i++) {
       result += this->data_[i][i];
