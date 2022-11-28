@@ -20,7 +20,7 @@ class Matrix {
   // совпадать с размерами в шаблонах.
   Matrix(const std::vector<std::vector<T>>& init_vector) {
     data_.resize(N);
-    for (int i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
       data_[i] = init_vector[i];
     }
   }
@@ -32,6 +32,8 @@ class Matrix {
       row.resize(M, elem);
     }
   }
+
+  ~Matrix() {}
 
   /*
    * Сложение, вычитание, операторы +=, -=.
@@ -123,7 +125,7 @@ class Matrix {
     Matrix result = *this * factor;
 
     data_.resize(N);
-    for (int i = 0; i < N; i++) {
+    for (size_t i = 0; i < N; i++) {
       data_[i] = result[i];
     }
 
@@ -155,9 +157,14 @@ class Matrix {
 
   // Оператор (i, j), возвращающий элемент матрицы в i-й строке и в j-м столбце.
   // Необходимо уметь менять значение для неконстантных матриц.
+  T& operator()(size_t i, size_t j) { return data_[i][j]; }
+  const T& operator()(size_t i, size_t j) const { return data_[i][j]; }
   std::vector<T>& operator[](size_t i) { return data_[i]; }
   const std::vector<T>& operator[](size_t i) const { return data_[i]; }
 
   // Оператор проверки на равенство.
   bool operator==(const Matrix& to_cmp) const { return data_ == to_cmp.data_; }
+
+ private:
+  std::vector<std::vector<T>> data_;
 };
