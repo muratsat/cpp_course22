@@ -5,6 +5,8 @@
 
 template <size_t n, size_t m, typename T = int64_t>
 class Matrix {
+  using Matrix::data_;
+
  public:
   // Конструктор по умолчанию заполняет матрицу T().
   Matrix() {
@@ -147,7 +149,8 @@ class Matrix {
   // Вычисление следа от неквадратной
   // матрицы не должно компилироваться.
   // template <typename = std::enable_if<n == m>>
-  T Trace() const requires(n == m) {
+  T Trace() const;
+  requires(n == m) {
     T result;
     for (size_t i = 0; i < n; i++) {
       result += data_[i][i];
