@@ -148,7 +148,6 @@ bool Ray::CrossesSegment(const Segment& segment) const {
   double s2 = (double)((b1 - b2) ^ d1) / (double)(d2 ^ d1);
 
   return 0 <= s1 && 0 <= s2 && s2 <= 1;
-  return false;
 }
 
 Ray* Ray::Clone() const { return new Ray(base_, base_ + direction_vector_); }
