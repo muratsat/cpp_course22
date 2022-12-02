@@ -208,9 +208,8 @@ bool Circle::CrossesSegment(const Segment& segment) const {
   Vector oa = a - o;
   Vector ob = b - o;
   int64_t double_area_squared = (oa ^ ob) * (oa ^ ob);
-  Vector ab = b - a;
-  int64_t ab_squared = ab.GetX() * ab.GetX() + ab.GetY() * ab.GetY();
-  if (double_area_squared > r_sqr * ab_squared) {
+  int64_t ab_sqr = DistSquared(a, b);
+  if (double_area_squared > r_sqr * ab_sqr) {
     return false;
   }
   Line line_ab(a, b);
