@@ -210,7 +210,8 @@ bool Circle::CrossesSegment(const Segment& segment) const {
   bool is_b_inside = IsInsideCircle(*this, point_b);
   if (is_a_inside && is_b_inside) {
     return false;
-  } else if (is_a_inside != is_b_inside) {
+  }
+  if (is_a_inside != is_b_inside) {
     return true;
   }
 
