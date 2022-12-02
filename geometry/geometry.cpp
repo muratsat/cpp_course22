@@ -3,7 +3,7 @@
 #include <cstdint>
 
 Point::Point() {}
-Point::Point(const Vector& v) { base_ = v; }
+Point::Point(const Vector& vector) { base_ = vector; }
 Point::Point(int64_t x, int64_t y) { base_ = Vector(x, y); }
 Point::~Point() {}
 
@@ -162,8 +162,8 @@ Circle::Circle(const Point& center, int64_t radius) : radius_(radius) {
 }
 Circle::~Circle() {}
 
-static int64_t DistSquared(const Point& p1, const Point& p2) {
-  Vector v = p2 - p1;
+static int64_t DistSquared(const Point& start, const Point& end) {
+  Vector v = end - start;
   return v.GetX() * v.GetX() + v.GetY() * v.GetY();
 }
 

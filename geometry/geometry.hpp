@@ -8,11 +8,13 @@ class Vector {
   Vector() {}
   // Конструктор от двух целочисленных переменных
   // (создает вектор с соответствующими координатами)
-  Vector(int64_t x, int64_t y) : x_(x), y_(y) {}
+  Vector(int64_t x_coord, int64_t y_coord) : x_(x_coord), y_(y_coord) {}
   ~Vector() {}
 
   // Оператор * для скалярного произведения
-  int64_t operator*(const Vector& v) const { return x_ * v.x_ + y_ * v.y_; }
+  int64_t operator*(const Vector& vector) const {
+    return x_ * vector.x_ + y_ * vector.y_;
+  }
 
   // Оператор ^ для векторного произведения
   // this(x1, y1),  v(x2, y2)
@@ -20,19 +22,21 @@ class Vector {
   //  | y1 y2 |
   // det = x1 * y2 - y1 * x2;
   //
-  int64_t operator^(const Vector& v) const { return x_ * v.y_ - y_ * v.x_; }
+  int64_t operator^(const Vector& vector) const {
+    return x_ * vector.y_ - y_ * vector.x_;
+  }
 
   // Операторы сложения/разности с другим вектором,
   // соответственно реализовать операторы += и -=
-  Vector& operator+=(const Vector& v) {
-    x_ += v.x_;
-    y_ += v.y_;
+  Vector& operator+=(const Vector& vector) {
+    x_ += vector.x_;
+    y_ += vector.y_;
     return *this;
   }
 
-  Vector& operator-=(const Vector& v) {
-    x_ -= v.x_;
-    y_ -= v.y_;
+  Vector& operator-=(const Vector& vector) {
+    x_ -= vector.x_;
+    y_ -= vector.y_;
     return *this;
   }
 
@@ -56,14 +60,14 @@ class Vector {
     return *this;
   }
 
-  friend Vector operator*(const Vector& v, int64_t scalar) {
-    Vector res = v;
+  friend Vector operator*(const Vector& vector, int64_t scalar) {
+    Vector res = vector;
     res *= scalar;
     return res;
   }
 
-  friend Vector operator*(int64_t scalar, const Vector& v) {
-    Vector res = v;
+  friend Vector operator*(int64_t scalar, const Vector& vector) {
+    Vector res = vector;
     res *= scalar;
     return res;
   }
@@ -117,8 +121,8 @@ class IShape {
 class Point : public IShape {
  public:
   Point();
-  Point(const Vector& v);
-  Point(int64_t x, int64_t y);
+  Point(const Vector& vector);
+  Point(int64_t x_coord, int64_t y_coord);
   ~Point();
 
   // проверка, содержит ли фигура точку
