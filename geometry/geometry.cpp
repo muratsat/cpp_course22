@@ -13,7 +13,7 @@ bool Point::ContainsPoint(const Point& point) const {
   return base_ == point.base_;
 }
 
-bool Point::CrossesSegment(const Segment& segment) const {
+bool Point::CrossSegment(const Segment& segment) const {
   Vector vector_a = segment.GetA() - *this;
   Vector vector_b = segment.GetB() - *this;
   return (vector_a ^ vector_b) == 0 && (vector_a * vector_b) <= 0;
@@ -36,10 +36,10 @@ Segment::Segment(const Point& start, const Point& end) {
 Segment::~Segment() {}
 
 bool Segment::ContainsPoint(const Point& point) const {
-  return point.CrossesSegment(*this);
+  return point.CrossSegment(*this);
 }
 
-bool Segment::CrossesSegment(const Segment& segment) const {
+bool Segment::CrossSegment(const Segment& segment) const {
   const Vector& dir1 = direction_vector_;
   const Vector& dir2 = segment.direction_vector_;
 
@@ -83,7 +83,7 @@ bool Line::ContainsPoint(const Point& point) const {
   return (vector ^ direction_vector_) == 0;
 }
 
-bool Line::CrossesSegment(const Segment& segment) const {
+bool Line::CrossSegment(const Segment& segment) const {
   Point point_a = segment.GetA();
   Point point_b = segment.GetB();
   if (ContainsPoint(point_a) || ContainsPoint(point_b)) {
@@ -130,7 +130,7 @@ bool Ray::ContainsPoint(const Point& point) const {
   return (vector ^ direction_vector_) == 0 && (vector * direction_vector_) >= 0;
 }
 
-bool Ray::CrossesSegment(const Segment& segment) const {
+bool Ray::CrossSegment(const Segment& segment) const {
   const Vector& dir1 = direction_vector_;
   const Vector& dir2 = segment.GetB() - segment.GetA();
 
@@ -155,7 +155,7 @@ Ray* Ray::Clone() const { return new Ray(base_, base_ + direction_vector_); }
 
 Point Ray::GetA() const { return base_; }
 
-Vector Ray::GetDirection() const { return direction_vector_; }
+Vector Ray::GetVector() const { return direction_vector_; }
 
 Circle::Circle() {}
 Circle::Circle(const Point& center, int64_t radius) : radius_(radius) {
@@ -198,7 +198,7 @@ static bool IsInsideCircle(const Circle& circle, const Point& point) {
 // if the distance is less or equal to radius,
 // then we check whether AB crosses the line
 // that is perpendicular to AB and contains the center of the circle
-bool Circle::CrossesSegment(const Segment& segment) const {
+bool Circle::CrossSegment(const Segment& segment) const {
   Point point_a = segment.GetA();
   Point point_b = segment.GetB();
   Point centre = GetCentre();
@@ -226,7 +226,7 @@ bool Circle::CrossesSegment(const Segment& segment) const {
   Line line_ab(point_a, point_b);
   Vector ab_normal_vector(line_ab.GetA(), line_ab.GetB());
   Line normal_line(base_, base_ + ab_normal_vector);
-  return normal_line.CrossesSegment(segment);
+  return normal_line.CrossSegment(segment);
 }
 
 Circle* Circle::Clone() const { return new Circle(base_, radius_); }

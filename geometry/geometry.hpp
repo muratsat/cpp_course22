@@ -109,7 +109,7 @@ class IShape {
   virtual bool ContainsPoint(const Point& point) const = 0;
 
   // проверка, пересекает ли отрезок фигуру
-  virtual bool CrossesSegment(const Segment& segment) const = 0;
+  virtual bool CrossSegment(const Segment& segment) const = 0;
 
   // вернуть указатель на копию фигуры
   virtual IShape* Clone() const = 0;
@@ -129,7 +129,7 @@ class Point : public IShape {
   bool ContainsPoint(const Point& point) const override;
 
   // проверка, пересекает ли отрезок фигуру
-  bool CrossesSegment(const Segment& segment) const override;
+  bool CrossSegment(const Segment& segment) const override;
 
   // вернуть указатель на копию фигуры
   Point* Clone() const override;
@@ -150,7 +150,7 @@ class Segment : public IShape {
   bool ContainsPoint(const Point& point) const override;
 
   // проверка, пересекает ли отрезок фигуру
-  bool CrossesSegment(const Segment& segment) const override;
+  bool CrossSegment(const Segment& segment) const override;
 
   // вернуть указатель на копию фигуры
   Segment* Clone() const override;
@@ -175,7 +175,7 @@ class Line : public IShape {
   bool ContainsPoint(const Point& point) const override;
 
   // проверка, пересекает ли отрезок фигуру
-  bool CrossesSegment(const Segment& segment) const override;
+  bool CrossSegment(const Segment& segment) const override;
 
   // вернуть указатель на копию фигуры
   Line* Clone() const override;
@@ -203,7 +203,7 @@ class Ray : public IShape {
   bool ContainsPoint(const Point& point) const override;
 
   // проверка, пересекает ли отрезок фигуру
-  bool CrossesSegment(const Segment& segment) const override;
+  bool CrossSegment(const Segment& segment) const override;
 
   // вернуть указатель на копию фигуры
   Ray* Clone() const override;
@@ -212,7 +212,7 @@ class Ray : public IShape {
   Point GetA() const;
 
   // get direction vector
-  Vector GetDirection() const;
+  Vector GetVector() const;
 
  private:
   Vector direction_vector_;
@@ -228,7 +228,7 @@ class Circle : public IShape {
   bool ContainsPoint(const Point& point) const override;
 
   // проверка, пересекает ли отрезок фигуру
-  bool CrossesSegment(const Segment& segment) const override;
+  bool CrossSegment(const Segment& segment) const override;
 
   // вернуть указатель на копию фигуры
   Circle* Clone() const override;
