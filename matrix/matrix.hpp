@@ -112,8 +112,8 @@ class Matrix {
     Matrix<N, K, T> result;
     for (size_t i = 0; i < N; i++) {
       for (size_t j = 0; j < K; j++) {
-        for (size_t l = 0; l < M; l++) {
-          result(i, j) += this->data_[i][l] * factor(l, j);
+        for (size_t it = 0; it < M; it++) {
+          result(i, j) += this->data_[i][it] * factor(it, j);
         }
       }
     }
@@ -156,8 +156,10 @@ class Matrix {
 
   // Оператор (i, j), возвращающий элемент матрицы в i-й строке и в j-м столбце.
   // Необходимо уметь менять значение для неконстантных матриц.
-  T& operator()(size_t i, size_t j) { return this->data_[i][j]; }
-  const T& operator()(size_t i, size_t j) const { return this->data_[i][j]; }
+  T& operator()(size_t row, size_t col) { return this->data_[row][col]; }
+  const T& operator()(size_t row, size_t col) const {
+    return this->data_[row][col];
+  }
 
   // Оператор проверки на равенство.
   bool operator==(const Matrix& to_cmp) const {
