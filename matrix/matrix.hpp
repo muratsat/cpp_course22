@@ -113,7 +113,7 @@ class Matrix {
     for (size_t i = 0; i < N; i++) {
       for (size_t j = 0; j < K; j++) {
         for (size_t l = 0; l < M; l++) {
-          result[i][j] += this->data_[i][l] * factor[l][j];
+          result(i, j) += this->data_[i][l] * factor(l, j);
         }
       }
     }
@@ -137,7 +137,7 @@ class Matrix {
     Matrix<M, N, T> transposed;
     for (size_t i = 0; i < N; i++) {
       for (size_t j = 0; j < M; j++) {
-        transposed[j][i] = this->data_[i][j];
+        transposed(j, i) = this->data_[i][j];
       }
     }
     return transposed;
@@ -158,8 +158,6 @@ class Matrix {
   // Необходимо уметь менять значение для неконстантных матриц.
   T& operator()(size_t i, size_t j) { return this->data_[i][j]; }
   const T& operator()(size_t i, size_t j) const { return this->data_[i][j]; }
-  std::vector<T>& operator[](size_t i) { return this->data_[i]; }
-  const std::vector<T>& operator[](size_t i) const { return this->data_[i]; }
 
   // Оператор проверки на равенство.
   bool operator==(const Matrix& to_cmp) const {
