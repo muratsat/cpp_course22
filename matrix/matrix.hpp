@@ -146,7 +146,7 @@ class Matrix {
   // Метод Trace() - вычислить след матрицы.
   // Вычисление следа от неквадратной
   // матрицы не должно компилироваться.
-  T Trace() const requires(N == M) {
+  T Trace() const {
     T result;
     for (size_t i = 0; i < N; i++) {
       result += this->data_[i][i];
@@ -313,7 +313,7 @@ class Matrix<N, N, T> {
   // Метод Trace() - вычислить след матрицы.
   // Вычисление следа от неквадратной
   // матрицы не должно компилироваться.
-  T Trace() const requires(N == N) {
+  T Trace() const {
     T result;
     for (size_t i = 0; i < N; i++) {
       result += this->data_[i][i];
