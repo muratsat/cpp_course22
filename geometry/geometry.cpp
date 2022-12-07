@@ -165,7 +165,7 @@ Circle::~Circle() {}
 
 static int64_t DistSquared(const Point& start, const Point& end) {
   Vector vector = end - start;
-  return vector.GetX() * vector.GetX() + vector.GetY() * vector.GetY();
+  return vector * vector;
 }
 
 bool Circle::ContainsPoint(const Point& point) const {
