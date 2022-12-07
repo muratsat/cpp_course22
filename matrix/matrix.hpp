@@ -143,17 +143,6 @@ class Matrix {
     return transposed;
   }
 
-  // Метод Trace() - вычислить след матрицы.
-  // Вычисление следа от неквадратной
-  // матрицы не должно компилироваться.
-  T Trace() const {
-    T result;
-    for (size_t i = 0; i < N; i++) {
-      result += this->data_[i][i];
-    }
-    return result;
-  }
-
   // Оператор (i, j), возвращающий элемент матрицы в i-й строке и в j-м столбце.
   // Необходимо уметь менять значение для неконстантных матриц.
   T& operator()(size_t row, size_t col) { return this->data_[row][col]; }
