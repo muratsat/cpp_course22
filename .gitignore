@@ -1,0 +1,6 @@
+.vscode
+testing_repo
+*/makefile
+*/tests*
+*/main*
+*.o
